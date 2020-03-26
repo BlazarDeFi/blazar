@@ -59,11 +59,11 @@ contract AaveExternalPool is BaseExternalPool, Ownable {
     }
   }
 
-  function balanceOf(address account) external view returns(uint256) {
+  function totalBalance() external view returns(uint256) {
     address aTokenAddress;
     ( , , , , , , , , , , ,aTokenAddress, ) = lendingPool.getReserveData(reserve());
     AToken aToken = AToken(aTokenAddress);
-    return aToken.balanceOf(account);
+    return aToken.balanceOf(address(this));
   }
 
   function () external payable {}

@@ -42,7 +42,7 @@
                      style="height: 24px; margin-right: 3px; margin-top: -3px;"> DAI
               </md-table-cell>
               <md-table-cell>Aave</md-table-cell>
-              <md-table-cell><b>? ($0)</b></md-table-cell>
+              <md-table-cell><b>{{treasure.DAI | token}}</b></md-table-cell>
             </md-table-row>
           </md-table>
 

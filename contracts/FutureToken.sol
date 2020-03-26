@@ -93,7 +93,7 @@ contract FutureToken is IERC1155, IAssetBacked {
     require(this.balanceOf(msg.sender, period) >= _amount, "No enough funds available");
 
     //Return funds from Aave
-    uint256 lendingPoolBalance = externalPool.balanceOf(address(this));
+    uint256 lendingPoolBalance = this.getTotalCollateral();
     uint256 toRedeem = _amount > lendingPoolBalance ? lendingPoolBalance : _amount;
     externalPool.withdraw(toRedeem, msg.sender);
 
@@ -194,6 +194,10 @@ contract FutureToken is IERC1155, IAssetBacked {
 
   function getTotalInterests() external view returns (uint256) {
     return balances[INTERESTS_SLOT][msg.sender];
+  }
+
+  function getTotalCollateral() public view returns(uint256) {
+    return externalPool.totalBalance();
   }
 
   function isEthBacked() external view returns(bool) {

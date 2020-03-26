@@ -32,12 +32,17 @@ async function setupFilters() {
     if (!value) return ''
     value = value * ethPrice;
     return "$" + value.toFixed(2);
-  })
+  });
   Vue.filter('fullEthToUsd', function (value) {
     if (!value) return '';
     let val = parseFloat(value);
     let usd = val * ethPrice;
     return val.toFixed(3) + " ($" + usd.toFixed(2) + ")";
+  });
+  Vue.filter('token', function (value) {
+    if (!value) return '';
+    let val = parseFloat(value);
+    return val.toFixed(2);
   })
 };
 

@@ -71,6 +71,7 @@
                              @click="transfer(balances['DAI'][i - 1], i-1, 'DAI')">
                     {{balances['DAI'][i - 1].toFixed(2)}}
                   </md-button>
+                  <span v-else>-</span>
                 </md-table-cell>
               </md-table-row>
               </md-table>

@@ -41,7 +41,7 @@ contract('Future token ETH', function ([owner, oracle]) {
   //   (await ft.balanceOf(owner, 2)).should.be.bignumber.equal(wei100);
   //   (await ft.getTotalInterests()).should.be.bignumber.equal('0');
   //
-  //   (await pool.balanceOf(ft.address)).should.be.bignumber.equal(wei100);
+  //   (await ft.getTotalCollateral()).should.be.bignumber.equal(wei100);
   //   web3.utils.fromWei(await web3.eth.getBalance(pool.address)).should.be.equal("100");
   // });
   //
@@ -53,7 +53,7 @@ contract('Future token ETH', function ([owner, oracle]) {
   //
   //   (await ft.balanceOf(owner, 2)).should.be.bignumber.equal(wei50);
   //
-  //   (await pool.balanceOf(ft.address)).should.be.bignumber.equal(wei50);
+  //   (await ft.getTotalCollateral()).should.be.bignumber.equal(wei50);
   //   web3.utils.fromWei(await web3.eth.getBalance(pool.address)).should.be.equal("50");
   // });
   //

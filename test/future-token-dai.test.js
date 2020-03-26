@@ -42,7 +42,7 @@ contract('Future token DAI', function ([owner, oracle]) {
     (await ft.balanceOf(owner, 2)).should.be.bignumber.equal('100');
     (await ft.getTotalInterests()).should.be.bignumber.equal('0');
 
-    (await pool.balanceOf(ft.address)).should.be.bignumber.equal('100');
+    (await ft.getTotalCollateral()).should.be.bignumber.equal('100');
     (await dai.balanceOf(pool.address)).should.be.bignumber.equal('100');
   });
 
@@ -54,7 +54,7 @@ contract('Future token DAI', function ([owner, oracle]) {
     (await dai.balanceOf(owner)).should.be.bignumber.equal('50');
     //Pool
     (await ft.balanceOf(owner, 2)).should.be.bignumber.equal('50');
-    (await pool.balanceOf(ft.address)).should.be.bignumber.equal('50');
+    (await ft.getTotalCollateral()).should.be.bignumber.equal('50');
     (await dai.balanceOf(pool.address)).should.be.bignumber.equal('50');
   });
 
@@ -68,7 +68,7 @@ contract('Future token DAI', function ([owner, oracle]) {
     //Depositor
     (await dai.balanceOf(owner)).should.be.bignumber.equal('53');
     //Pool
-    (await pool.balanceOf(ft.address)).should.be.bignumber.equal('47');
+    (await ft.getTotalCollateral()).should.be.bignumber.equal('47');
     (await dai.balanceOf(pool.address)).should.be.bignumber.equal('47');
   });
 
@@ -82,7 +82,7 @@ contract('Future token DAI', function ([owner, oracle]) {
     //Depositor
     (await dai.balanceOf(owner)).should.be.bignumber.equal('50');
     //Pool
-    (await pool.balanceOf(ft.address)).should.be.bignumber.equal('50');
+    (await ft.getTotalCollateral()).should.be.bignumber.equal('50');
     (await dai.balanceOf(pool.address)).should.be.bignumber.equal('50');
   });
 

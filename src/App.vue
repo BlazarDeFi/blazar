@@ -30,7 +30,16 @@
         </md-tabs>
 
 
-      <div class="md-toolbar-section-end">
+      <div class="md-toolbar-section-end" >
+        <md-tabs class="md-primary" md-sync-route>
+        <md-tab
+          key="stats"
+          to="/stats"
+          md-label="Stats"
+          exact>
+        </md-tab>
+        </md-tabs>
+
         <a href="https://github.com/alice-si/future-tokens" target="_blank" style="color: white;">
           <i class="fa fa-github" style="font-size:32px"></i>
         </a>

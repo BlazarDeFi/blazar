@@ -24,7 +24,7 @@ contract MockExternalPool is BaseExternalPool {
     }
   }
 
-  function balanceOf(address account) external view returns(uint256) {
+  function totalBalance() external view returns(uint256) {
     return balance;
   }
 

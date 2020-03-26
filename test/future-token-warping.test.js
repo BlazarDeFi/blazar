@@ -44,7 +44,7 @@ contract('Future token ETH', function ([owner, oracle]) {
     (await ft.getTotalInterests()).should.be.bignumber.equal("0");
 
     //External pool
-    (await pool.balanceOf(ft.address)).should.be.bignumber.equal("100");
+    (await ft.getTotalCollateral()).should.be.bignumber.equal("100");
     (await web3.eth.getBalance(pool.address)).should.be.equal("100");
   });
 
@@ -57,7 +57,7 @@ contract('Future token ETH', function ([owner, oracle]) {
     (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("100");
 
     //External pool
-    (await pool.balanceOf(ft.address)).should.be.bignumber.equal("95");
+    (await ft.getTotalCollateral()).should.be.bignumber.equal("95");
     (await web3.eth.getBalance(pool.address)).should.be.equal("95");
   });
 
@@ -70,7 +70,7 @@ contract('Future token ETH', function ([owner, oracle]) {
     (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("0");
 
     //External pool
-    (await pool.balanceOf(ft.address)).should.be.bignumber.equal("100");
+    (await ft.getTotalCollateral()).should.be.bignumber.equal("100");
     (await web3.eth.getBalance(pool.address)).should.be.equal("100");
   });
 
