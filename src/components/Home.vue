@@ -100,8 +100,8 @@
   import { getLendingData, makeDeposit} from '@/blockchain/futureToken'
   import { getLendingConfig, getReserveData, depositDai } from '@/blockchain/aave'
   import { deployFutureToken} from '@/blockchain/deployer'
-  import { getBalances } from '@/blockchain/wallet'
-  import { getRates } from '@/blockchain/stats'
+  import { getBalances} from '@/blockchain/wallet'
+  import { getRates, calculateInterest } from '@/blockchain/stats'
   import State from '@/state'
   import RangeSlider from 'vue-range-slider'
   import 'vue-range-slider/dist/vue-range-slider.css'
@@ -131,7 +131,7 @@
     computed: {
       // a computed getter
       interest: function () {
-        return (this.deposit - (this.deposit/((100+(this.selectedCurrency.rate*this.time/12))/100))).toFixed(this.precision)
+        return calculateInterest(this.deposit, this.time, this.selectedCurrency);
       }
     },
     beforeCreate: async function () {

@@ -36,3 +36,7 @@ export async function getRates() {
   state.currencies.eth.rate = await getRate('ETH');
   state.currencies.dai.rate = await getRate('DAI');
 }
+
+export function calculateInterest(amount, period, currency) {
+  return (amount - (amount/((100+(currency.rate * period/12))/100))).toFixed(currency.precision)
+}
