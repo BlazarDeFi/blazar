@@ -161,7 +161,10 @@
         try {
           await makeDeposit(this.deposit, this.time, this.selectedCurrency.title);
           this.$router.push({path: '/future'});
-          let toast = this.$toasted.show("You've just earned $" + this.interestsUSD + " interests !", {
+          let interestText = this.selectedCurrency.title == 'ETH'
+            ? this.$options.filters.ethToUsd(this.interest)
+            : (this.interest + " " + this.selectedCurrency.title);
+          let toast = this.$toasted.show("You've just earned " + interestText + " interests !", {
             theme: "bubble",
             position: "top-center",
             duration : 5000,
