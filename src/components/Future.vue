@@ -64,12 +64,12 @@
                   <img src="https://testnet.aave.com/static/media/dai.59d423e0.svg"
                        style="height: 24px; margin-right: 3px; margin-top: -3px;"> DAI
                 </md-table-cell>
-                <md-table-cell><b>{{balances['DAI'][12].toFixed(2)}}</b></md-table-cell>
+                <md-table-cell><b>{{balances['DAI'][12] | token}}</b></md-table-cell>
 
                 <md-table-cell v-for="i in 12" :key="i">
                   <md-button class="md-fab md-mini" style="color: white;" v-if="balances['DAI'][i - 1] > 0"
                              @click="transfer(balances['DAI'][i - 1], i-1, 'DAI')">
-                    {{balances['DAI'][i - 1].toFixed(2)}}
+                    {{balances['DAI'][i - 1] | token}}
                   </md-button>
                   <span v-else>-</span>
                 </md-table-cell>
