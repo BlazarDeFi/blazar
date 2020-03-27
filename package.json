@@ -1,9 +1,8 @@
 {
-  "name": "daj",
+  "name": "Blazar",
   "version": "0.1.0",
-  "description": "Money from the future by time-warping interest",
+  "description": "Defi's stable lending pool",
   "author": "Jakub Wojciechowski <jakub@alice.si>",
-  "private": true,
   "scripts": {
     "dev": "node scripts/dev-server.js",
     "start": "npm run dev",
