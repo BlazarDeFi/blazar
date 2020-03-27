@@ -13,9 +13,9 @@ async function getEthBalance() {
   let web3 = await getWeb3();
   return new Promise((resolve, reject) => {
     web3.eth.getBalance(main, function(e,result) {
-      state.balance.eth = parseFloat(web3.fromWei(result, 'ether'));
-      console.log("Eth balance: " + state.balance.eth);
-      resolve(state.balance.eth);
+      state.currencies.eth.balance = parseFloat(web3.fromWei(result, 'ether'));
+      console.log("Eth balance: " + state.currencies.eth.balance);
+      resolve(state.currencies.eth.balance);
     })
   });
 }
@@ -24,8 +24,8 @@ async function getDaiBalance() {
   let main = await getMainAccount();
   let dai = await getDaiToken();
   let balance = await dai.balanceOf(main);
-  state.balance.dai = parseFloat(web3.fromWei(balance, 'ether'));
-  console.log("Dai balance: " + state.balance.dai);
+  state.currencies.dai.balance = parseFloat(web3.fromWei(balance, 'ether'));
+  console.log("Dai balance: " + state.currencies.dai.balance);
 }
 
 export async function getBalances() {

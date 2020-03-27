@@ -9,7 +9,7 @@
       <div class="md-layout-item md-size-70">
 
         <div class="text">I want to deposit <span class="dinput">{{deposit.toFixed(2)}}</span>
-          <v-select :options="currencies" label="title" v-model="selectedCurrency" @input="onCurrencyChange()">
+          <v-select :options="Object.values(currencies)" label="title" v-model="selectedCurrency" @input="onCurrencyChange()">
             <template v-slot:option="option">
               {{ option.title }}
             </template>
@@ -55,7 +55,7 @@
           <md-card-header-text>
             <div class="md-title">ETH</div>
             <div class="md-subhead"><b>5%</b> APY</div>
-            Balance: <b>{{balance.eth | fullEthToUsd}}</b>
+            Balance: <b>{{currencies.eth.balance | fullEthToUsd}}</b>
           </md-card-header-text>
 
           <md-card-media>
@@ -70,7 +70,7 @@
           <md-card-header-text>
             <div class="md-title">DAI</div>
             <div class="md-subhead"><b>10%</b> APY</div>
-            Balance: <b>{{balance.dai.toFixed(2)}} </b>
+            Balance: <b>{{currencies.dai.balance.toFixed(2)}} </b>
           </md-card-header-text>
 
           <md-card-media>
@@ -115,32 +115,14 @@
     data() {
       return {
         showModal: false,
-        balance: State.balance,
-        currencies: [
-          {
-            icon: 'https://testnet.aave.com/static/media/eth.1a64eee6.svg',
-            code: 'eth',
-            title: 'ETH',
-            rate: 5,
-            step: 0.01,
-            precision: 3
-          },
-          {
-            icon: 'https://testnet.aave.com/static/media/dai.59d423e0.svg',
-            code: 'dai',
-            title: 'DAI',
-            rate: 10,
-            step: 0.1,
-            precision: 2
-          }
-        ],
+        currencies: State.currencies,
         deposit: 0,
         maxDeposit:0,
         time: 6,
         step: 0.01,
         precision: 3,
         init: function() {
-          this.selectedCurrency = this.currencies[0];
+          this.selectedCurrency = this.currencies.eth;
           return this;
         }
       }.init()
@@ -159,9 +141,9 @@
     },
     methods: {
       onCurrencyChange: function() {
-        console.log("Currency changed: " + this.selectedCurrency.code);
-        this.deposit = this.balance[this.selectedCurrency.code]/2;
-        this.maxDeposit = this.balance[this.selectedCurrency.code];
+        console.log("Currency changed: " + this.selectedCurrency.title);
+        this.deposit = this.selectedCurrency.balance / 2;
+        this.maxDeposit = this.selectedCurrency.balance;
         this.step = this.selectedCurrency.step;
         this.precision = this.selectedCurrency.precision;
       },
