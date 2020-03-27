@@ -54,7 +54,7 @@
         <md-card-header>
           <md-card-header-text>
             <div class="md-title">ETH</div>
-            <div class="md-subhead"><b>5%</b> APY</div>
+            <div class="md-subhead"><b>{{currencies.eth.rate}}%</b> APY</div>
             Balance: <b>{{currencies.eth.balance | fullEthToUsd}}</b>
           </md-card-header-text>
 
@@ -69,7 +69,7 @@
         <md-card-header>
           <md-card-header-text>
             <div class="md-title">DAI</div>
-            <div class="md-subhead"><b>10%</b> APY</div>
+            <div class="md-subhead"><b>{{currencies.dai.rate}}%</b> APY</div>
             Balance: <b>{{currencies.dai.balance.toFixed(2)}} </b>
           </md-card-header-text>
 
@@ -101,6 +101,7 @@
   import { getLendingConfig, getReserveData, depositDai } from '@/blockchain/aave'
   import { deployFutureToken} from '@/blockchain/deployer'
   import { getBalances } from '@/blockchain/wallet'
+  import { getRates } from '@/blockchain/stats'
   import State from '@/state'
   import RangeSlider from 'vue-range-slider'
   import 'vue-range-slider/dist/vue-range-slider.css'
@@ -136,6 +137,7 @@
     beforeCreate: async function () {
       window.redeploy = deployFutureToken;
       await getBalances();
+      await getRates();
       this.onCurrencyChange();
 
     },
