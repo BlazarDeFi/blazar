@@ -44,6 +44,18 @@ async function setupFilters() {
     let val = parseFloat(value);
     return val.toFixed(2);
   })
+  Vue.filter('formatCurrency', function (value, currency) {
+    if (!value) return '';
+    let val = parseFloat(value);
+    if (currency.title === 'ETH') {
+      let usd = val * ethPrice;
+      return val.toFixed(3) + " ETH ($" + usd.toFixed(2) + ")";
+    } else {
+      return val.toFixed(2) + " " + currency.title;
+    }
+
+
+  })
 };
 
 setupFilters();

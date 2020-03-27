@@ -34,10 +34,9 @@
           v-model="time">
         </range-slider>
 
-        <div class="text">and get <b> {{interest}} </b> {{selectedCurrency.code && selectedCurrency.code.toUpperCase()}}
-          <span v-if="selectedCurrency.code == 'eth'">( <b>{{ interest | ethToUsd}}</b> )</span>
-
-          now!</div>
+        <div class="text">
+          and get <b> {{interest | formatCurrency(selectedCurrency)}} </b> now!
+        </div>
 
         <div style="text-align: center">
           <md-button id="deposit-button" class="md-raised md-accent" @click="makeDeposit">Deposit</md-button>

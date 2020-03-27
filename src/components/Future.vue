@@ -51,29 +51,30 @@
                   </md-table-cell>
                   <md-table-cell><b>{{balances['ETH'][12] | fullEthToUsd}}</b></md-table-cell>
                   <md-table-cell v-for="i in 12" :key="i">
-                      <md-button class="md-fab md-mini" style="color: white;" v-if="balances['ETH'] && balances['ETH'][i - 1] > 0"
-                                 @click="transfer(balances['ETH'][i - 1], i-1, 'ETH')">
-                        {{balances['ETH'][i - 1]}}
-                      </md-button>
+                    <md-button class="md-fab md-mini" style="color: white;"
+                               v-if="balances['ETH'] && balances['ETH'][i - 1] > 0"
+                               @click="transfer(balances['ETH'][i - 1], i-1, 'ETH')">
+                      {{balances['ETH'][i - 1]}}
+                    </md-button>
                     <span v-else>-</span>
                   </md-table-cell>
                 </md-table-row>
 
-              <md-table-row v-if="balances['DAI']">
-                <md-table-cell>
-                  <img src="https://testnet.aave.com/static/media/dai.59d423e0.svg"
-                       style="height: 24px; margin-right: 3px; margin-top: -3px;"> DAI
-                </md-table-cell>
-                <md-table-cell><b>{{balances['DAI'][12] | token}}</b></md-table-cell>
+                <md-table-row v-if="balances['DAI']">
+                  <md-table-cell>
+                    <img src="https://testnet.aave.com/static/media/dai.59d423e0.svg"
+                         style="height: 24px; margin-right: 3px; margin-top: -3px;"> DAI
+                  </md-table-cell>
+                  <md-table-cell><b>{{balances['DAI'][12] | token}}</b></md-table-cell>
 
-                <md-table-cell v-for="i in 12" :key="i">
-                  <md-button class="md-fab md-mini" style="color: white;" v-if="balances['DAI'][i - 1] > 0"
-                             @click="transfer(balances['DAI'][i - 1], i-1, 'DAI')">
-                    {{balances['DAI'][i - 1] | token}}
-                  </md-button>
-                  <span v-else>-</span>
-                </md-table-cell>
-              </md-table-row>
+                  <md-table-cell v-for="i in 12" :key="i">
+                    <md-button class="md-fab md-mini" style="color: white;" v-if="balances['DAI'][i - 1] > 0"
+                               @click="transfer(balances['DAI'][i - 1], i-1, 'DAI')">
+                      {{balances['DAI'][i - 1] | token}}
+                    </md-button>
+                    <span v-else>-</span>
+                  </md-table-cell>
+                </md-table-row>
               </md-table>
 
 
@@ -84,72 +85,86 @@
     </div>
 
 
-    <md-dialog :md-active.sync="showTransferDialog" style="width: 500px; height: 350px;">
+    <md-dialog :md-active.sync="showTransferDialog" style="width: 500px; height: 380px;">
       <md-dialog-title>Transfer</md-dialog-title>
 
-      <md-tabs md-dynamic-height>
-        <md-tab md-label="In space">
-          <form novalidate>
-            <div class="form-container">
-              <md-field>
-                <label for="spaceValue">Value (max: {{this.selectedMax}})</label>
-                <md-input name="spaceValue" id="spaceValue" v-model="spaceValue" />
-              </md-field>
+
+      <form novalidate>
+        <div class="form-container">
+          <div class="value-box">
+            <md-field>
+              <label for="value">Value <span class="max-link" @click="setMaxValue()">(max: {{this.selectedMax}})</span></label>
+              <md-input name="value" id="spaceValue" v-model="value"/>
+            </md-field>
+          </div>
+
+          <md-tabs md-dynamic-height @md-changed="onTabChange">
+            <md-tab id="spaceTab" md-label="In space">
 
               <md-field>
                 <label for="spaceAddress">Target address</label>
-                <md-input name="spaceAddress" id="spaceAddress" v-model="spaceAddress" />
+                <md-input name="spaceAddress" id="spaceAddress" v-model="spaceAddress"/>
               </md-field>
-            </div>
 
-            <div style="text-align: center">
-              <md-button class="md-primary md-raised" @click="transferInSpace()">Transfer</md-button>
-            </div>
-          </form>
-        </md-tab>
+            </md-tab>
 
-        <md-tab md-label="In time">
-          <form novalidate>
-            <div class="form-container">
-              <md-field>
-                <label for="timeValue">Value (max: {{this.selectedMax}})</label>
-                <md-input name="timeValue" id="timeValue" v-model="timeValue" />
-              </md-field>
+            <md-tab id="timeTab" md-label="In time">
+
 
               <div style="font-size: 12px; color: gray;">Target month: <b>{{timeTarget}}</b></div>
-                <!--<md-input name="timeTarget" id="timeTarget" v-model="timeTarget" />-->
-                <range-slider
-                  class="slider"
-                  min="3"
-                  max="12"
-                  step="1"
-                  v-model="timeTarget">
-                </range-slider>
+              <!--<md-input name="timeTarget" id="timeTarget" v-model="timeTarget" />-->
+              <range-slider
+                class="slider"
+                min="3"
+                max="12"
+                step="1"
+                v-model="timeTarget">
+              </range-slider>
 
 
-              <div style="font-size: 14px;" v-if="price >= 0">You will receive: <span style="color: green;"><b>{{price}}</b> ETH (${{(price*223).toFixed(2)}})</span></div>
+              <div style="font-size: 14px;" v-if="price >= 0">
+                You will receive:
+                <span style="color: green;">
+                  <b>{{price | formatCurrency(selectedCurrency)}}</b>
+                </span>
+              </div>
 
-              <div style="font-size: 14px;" v-if="price < 0">You will need to pay: <span style="color: red;"><b>{{price}}</b> ETH (${{(price*223).toFixed(2)}})</span></div>
+              <div style="font-size: 14px; " v-if="price < 0">
+                You will need to pay:
+                  <span style="color: red;">
+                    <b>{{price | formatCurrency(selectedCurrency)}}</b>
+                  </span>
+              </div>
 
 
-            </div>
-            <div style="text-align: center; margin-top: 10px;">
-              <md-button class="md-primary md-raised" @click="transferInTime()">Transfer</md-button>
-            </div>
-          </form>
-        </md-tab>
-        <md-tab md-label="Withdraw" v-if="selectedPeriod === 2">
-          <div style="text-align: center">
-            <md-button class="md-accent md-raised" @click="withdraw()" >Withdraw</md-button>
+            </md-tab>
+
+            <md-tab id="withdrawTab" md-label="Withdraw">
+              <div style="font-size: 14px; text-align: center; margin-top: 20px;">
+                You will need to pay:
+                  <span style="color: red;">
+                    <b>{{withdrawPrice | formatCurrency(selectedCurrency)}}</b>
+                  </span>
+              </div>
+            </md-tab>
+
+          </md-tabs>
+
+          <div style="text-align: center; margin-top: 10px;">
+            <md-button class="md-primary md-raised" @click="executeTransfer()">Transfer</md-button>
           </div>
-        </md-tab>
 
-      </md-tabs>
+        </div>
+      </form>
+
+
     </md-dialog>
 
     <md-dialog :md-active.sync="showSpaceTransferModal">
       <div class="container">
-        <img src="https://media2.giphy.com/media/pZdilWYCMEEus/giphy.gif?cid=790b761182bf4ed027d156fc665d39b1dc7b4082c2f482b6&rid=giphy.gif" alt="Snow" style="width:100%;">
+        <img
+          src="https://media2.giphy.com/media/pZdilWYCMEEus/giphy.gif?cid=790b761182bf4ed027d156fc665d39b1dc7b4082c2f482b6&rid=giphy.gif"
+          alt="Snow" style="width:100%;">
         <div class="image-overlay">Transferring your tokens in space</div>
       </div>
     </md-dialog>
@@ -169,7 +184,9 @@
   import {getBalances, spaceTransfer, timeTransfer, withdraw} from '@/blockchain/futureToken'
   import {getLendingConfig, getReserveData} from '@/blockchain/aave'
   import {deployFutureCoin} from '@/blockchain/deployer'
+  import { calculateInterest, getRates } from '@/blockchain/stats'
   import RangeSlider from 'vue-range-slider'
+  import State from '@/state'
   import 'vue-range-slider/dist/vue-range-slider.css'
 
   export default {
@@ -179,60 +196,75 @@
     },
     data() {
       return {
+        currencies: State.currencies,
         balances: {},
         showTransferDialog: false,
         selectedMax: 0,
         selectedPeriod: 0,
         selectedCurrency: '',
         spaceAddress: "",
-        spaceValue: 0,
+        value: 0,
         showSpaceTransferModal: false,
         showTimeTransferModal: false,
-        timeValue: 0,
-        timeTarget: 0
+        timeTarget: 0,
+        transferTab: "spaceTab"
       }
     },
     computed: {
       // a computed getter
       price: function () {
-        let time = this.timeTarget - this.selectedPeriod - 1;
-        let formula = (100 + (5 * Math.abs(time) / 12)) / 100;
-        console.log("Formula: " + formula);
-        if (time > 0) {
-          return (this.timeValue - (this.timeValue / formula)).toFixed(5);
+        if (this.selectedCurrency) {
+          let period = this.timeTarget - this.selectedPeriod - 1;
+          return calculateInterest(this.value, period, this.selectedCurrency);
         } else {
-          return -((this.timeValue*formula - this.timeValue).toFixed(5));
+          return 0;
         }
+      },
+      withdrawPrice: function() {
+        return calculateInterest(this.value, this.selectedPeriod-2, this.selectedCurrency);
       }
     },
     beforeCreate: async function () {
       this.balances = await getBalances();
+      await getRates();
     },
     methods: {
       transfer(val, period, currency) {
         this.selectedMax = val;
         this.selectedPeriod = period;
-        this.selectedCurrency = currency;
+        this.selectedCurrency = this.currencies[currency.toLowerCase()];
         this.timeTarget = period + 1;
-        console.log("Transferring " + this.selectedCurrency + " max: " + this.selectedMax + " from: " + this.selectedPeriod);
+        console.log("Transferring " + this.selectedCurrency.title + " max: " + this.selectedMax + " from: " + this.selectedPeriod);
         this.showTransferDialog = true;
       },
+      onTabChange: function(id) {
+        this.transferTab = id;
+      },
+      executeTransfer: async function() {
+        if (this.transferTab === "spaceTab") {
+          await this.transferInSpace();
+        } else if (this.transferTab === "timeTab") {
+          await this.transferInTime();
+        } else {
+          await this.withdraw();
+        }
+      },
       transferInSpace: async function () {
-        console.log("Transferring in space: " + this.spaceValue + " to: " + this.spaceAddress);
+        console.log("Transferring in space: " + this.value + " to: " + this.spaceAddress);
         this.showTransferDialog = false;
         this.showSpaceTransferModal = true;
-        await spaceTransfer(this.spaceAddress, this.selectedPeriod, this.spaceValue, this.selectedCurrency);
+        await spaceTransfer(this.spaceAddress, this.selectedPeriod, this.value, this.selectedCurrency.title);
         this.showSpaceTransferModal = false;
         this.balances = await getBalances();
       },
       transferInTime: async function () {
-        console.log("Transferring in time: " + this.timeValue + " from: " + this.selectedPeriod + " to: " + this.timeTarget);
+        console.log("Transferring in time: " + this.value + " from: " + this.selectedPeriod + " to: " + this.timeTarget);
         this.showTransferDialog = false;
         this.showTimeTransferModal = true;
         try {
-          await timeTransfer(this.timeTarget -1, this.selectedPeriod, this.timeValue, this.selectedCurrency);
-          if (this.timeTarget -1 > this.selectedPeriod) {
-            let toast = this.$toasted.show("You've just earned $" + (this.price*223).toFixed(2) + " interests !", {
+          await timeTransfer(this.timeTarget - 1, this.selectedPeriod, this.value, this.selectedCurrency.title);
+          if (this.timeTarget - 1 > this.selectedPeriod) {
+            let toast = this.$toasted.show("You've just earned $" + (this.price * 223).toFixed(2) + " interests !", {
               theme: "bubble",
               position: "top-center",
               duration: 5000,
@@ -251,6 +283,10 @@
         await withdraw(this.selectedMax);
         this.showSpaceTransferModal = false;
         this.balances = await getBalances();
+      },
+      setMaxValue: function () {
+        console.log("Setting max value");
+        this.value = this.selectedMax;
       }
     }
   }
@@ -264,6 +300,11 @@
     width: 100%;
     height: 800px;
     text-align: center;
+  }
+
+  .form-container {
+    padding: 20px;
+    background-color: white;
   }
 
   .text {
@@ -298,7 +339,7 @@
   }
 
   .slider {
-    width: 470px !important;
+    width: 420px !important;
   }
 
   .range-slider-fill {
@@ -307,6 +348,23 @@
 
   .md-dialog-container {
     width: 500px;
+  }
+
+  .value-box {
+    padding: 0 20% 0 15%;
+  }
+
+  .md-dialog .md-tabs-navigation {
+    margin-left: 10%;
+  }
+
+  .md-dialog .md-tab {
+    height: 100px;
+  }
+
+  span.max-link {
+    text-decoration: underline;
+    cursor: pointer;
   }
 
 

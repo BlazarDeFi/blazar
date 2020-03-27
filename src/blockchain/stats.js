@@ -38,5 +38,9 @@ export async function getRates() {
 }
 
 export function calculateInterest(amount, period, currency) {
-  return (amount - (amount/((100+(currency.rate * period/12))/100))).toFixed(currency.precision)
+  let formula = (100+(currency.rate*Math.abs(period)/12))/100;
+  console.log("F: " + formula);
+  let interest =  Math.sign(period) * (amount * formula - amount);
+  console.log("Calculate " + amount + " " + currency.title + " for: " + period + " = " + interest);
+  return interest;
 }
