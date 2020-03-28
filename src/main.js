@@ -53,8 +53,6 @@ async function setupFilters() {
     } else {
       return val.toFixed(2) + " " + currency.title;
     }
-
-
   })
 };
 

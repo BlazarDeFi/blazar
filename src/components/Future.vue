@@ -277,10 +277,10 @@
         }
       },
       withdraw: async function () {
-        console.log("Withdraw: " + this.selectedMax);
+        console.log("Withdraw: " + this.value);
         this.showTransferDialog = false;
         this.showSpaceTransferModal = true;
-        await withdraw(this.selectedMax);
+        await withdraw(this.value, this.selectedPeriod, this.selectedCurrency.title);
         this.showSpaceTransferModal = false;
         this.balances = await getBalances();
       },

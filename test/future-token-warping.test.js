@@ -63,22 +63,32 @@ contract('Future token ETH', function ([owner, oracle]) {
 
 
   it("should warp money backward", async function () {
-    await ft.warp(100, 7, 2, {value: 5});
+    await ft.warp(80, 7, 2, {value: 4});
 
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("100");
-    (await ft.getTotalInterests()).should.be.bignumber.equal("0");
-    (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("0");
+    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("80");
+    (await ft.getTotalInterests()).should.be.bignumber.equal("1");
+    (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("20");
 
     //External pool
-    (await ft.getTotalCollateral()).should.be.bignumber.equal("100");
-    (await web3.eth.getBalance(pool.address)).should.be.equal("100");
+    (await ft.getTotalCollateral()).should.be.bignumber.equal("99");
+    (await web3.eth.getBalance(pool.address)).should.be.equal("99");
   });
 
 
-  it("should withdraw the money", async function () {
-    await ft.withdraw(100);
+  it("should withdraw the money from current period", async function () {
+    await ft.withdraw(80, 2);
 
     (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("0");
+    (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("20");
+    (await ft.getTotalInterests()).should.be.bignumber.equal("1");
+  });
+
+
+  it("should withdraw the money from past period", async function () {
+    await ft.withdraw(20, 7, {value: 1});
+
+    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("0");
+    (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("0");
     (await ft.getTotalInterests()).should.be.bignumber.equal("0");
   });
 

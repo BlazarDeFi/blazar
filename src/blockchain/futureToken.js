@@ -54,11 +54,11 @@ export async function timeTransfer(_to, _id, _amount, _currency) {
   console.log(tx);
 }
 
-export async function withdraw(_amount) {
+export async function withdraw(_amount, _from, _currency) {
   console.log("Withdraw: " + _amount);
-  let fc = await getFutureToken();
+  let fc = await getFutureToken(_currency);
   let wei = web3.toWei(_amount / SCALING_FACTOR, 'ether');
-  let tx = await fc.withdraw(wei);
+  let tx = await fc.withdraw(wei, _from);
 
   console.log(tx);
 }

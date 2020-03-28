@@ -88,20 +88,29 @@ contract FutureToken is IERC1155, IAssetBacked {
 
 
 
-  function withdraw(uint256 _amount) external {
-    uint256 period = this.getCurrentPeriod();
-    require(this.balanceOf(msg.sender, period) >= _amount, "No enough funds available");
+  function withdraw(uint256 _amount, uint256 _periodFrom) external payable {
+    require(this.balanceOf(msg.sender, _periodFrom) >= _amount, "No enough funds available");
+
+    uint256 currentPeriod = this.getCurrentPeriod();
+    if (_periodFrom != this.getCurrentPeriod()) {
+      _warp(msg.sender, _amount, _periodFrom, currentPeriod);
+    }
 
     //Return funds from Aave
     uint256 lendingPoolBalance = this.getTotalCollateral();
     uint256 toRedeem = _amount > lendingPoolBalance ? lendingPoolBalance : _amount;
     externalPool.withdraw(toRedeem, msg.sender);
 
-    _burn(msg.sender, period, toRedeem);
+    _burn(msg.sender, currentPeriod, toRedeem);
   }
 
   function warp(uint256 _amount, uint256 _periodFrom, uint256 _periodTo) external payable {
-    require(this.balanceOf(msg.sender, _periodFrom) >= _amount, "No enough funds available");
+    _warp(msg.sender, _amount, _periodFrom, _periodTo);
+  }
+
+
+  function _warp(address payable _account, uint256 _amount, uint256 _periodFrom, uint256 _periodTo) internal {
+    require(this.balanceOf(_account, _periodFrom) >= _amount, "No enough funds available");
     require(_periodTo >= this.getCurrentPeriod(), "Cannot transfer to the past");
 
     bool isForward = _periodTo > _periodFrom;
@@ -109,19 +118,18 @@ contract FutureToken is IERC1155, IAssetBacked {
     uint256 warpPrice = getWarpPrice(_amount, periodDiff);
 
     if (isForward) {
-      balances[INTERESTS_SLOT][msg.sender] = balances[INTERESTS_SLOT][msg.sender].add(warpPrice);
-      externalPool.withdraw(warpPrice, msg.sender);
+      balances[INTERESTS_SLOT][_account] = balances[INTERESTS_SLOT][_account].add(warpPrice);
+      externalPool.withdraw(warpPrice, _account);
     } else {
-      uint256 effectivePrice = warpPrice > balances[INTERESTS_SLOT][msg.sender] ? balances[INTERESTS_SLOT][msg.sender] : warpPrice;
-      balances[INTERESTS_SLOT][msg.sender] = balances[INTERESTS_SLOT][msg.sender].sub(effectivePrice);
+      uint256 effectivePrice = warpPrice > balances[INTERESTS_SLOT][_account] ? balances[INTERESTS_SLOT][_account] : warpPrice;
+      balances[INTERESTS_SLOT][_account] = balances[INTERESTS_SLOT][_account].sub(effectivePrice);
       if (this.isEthBacked()) {
         require(msg.value >= warpPrice, "Not enough ether attached to the transaction");
         externalPool.deposit.value(warpPrice)(warpPrice);
       } else {
-        IERC20(originalAsset).transferFrom(msg.sender, address(externalPool), warpPrice);
+        IERC20(originalAsset).transferFrom(_account, address(externalPool), warpPrice);
         externalPool.deposit(warpPrice);
       }
-
     }
 
     balances[_periodFrom][msg.sender] = balances[_periodFrom][msg.sender].sub(_amount);
