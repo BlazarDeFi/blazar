@@ -237,6 +237,14 @@
     background-color: #E84F89;
   }
 
+  .vs__clear {
+    display: none !important;
+  }
+
+  .v-select {
+    min-width: 110px;
+  }
+
 
 
 </style>
