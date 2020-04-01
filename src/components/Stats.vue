@@ -2,14 +2,16 @@
 <template>
   <div class="page">
 
-    <md-card>
+    <div class="md-layout md-gutter">
+
+    <md-card class="md-layout-item md-size-49">
       <md-ripple>
 
         <md-card-header class="md-layout-item md-size-100">
           <md-card-header-text>
-            <div class="md-title">Treasure</div>
+            <div class="md-title">Assets</div>
             <div class="md-subhead">
-              Assets owned by the protocol
+              Where deposits on Blazar are being put to work to generate interest.
             </div>
           </md-card-header-text>
 
@@ -51,12 +53,63 @@
       </md-ripple>
     </md-card>
 
+    <md-card class="md-layout-item md-size-49">
+      <md-ripple>
+
+        <md-card-header class="md-layout-item md-size-100">
+          <md-card-header-text>
+            <div class="md-title">Liabilities</div>
+            <div class="md-subhead">
+              Where loans on Blazar are being funded from.
+            </div>
+          </md-card-header-text>
 
 
-    <div>
-      <md-button class="md-raised md-accent" @click="deployAaveEthExternalPool">Deploy Aave Eth Pool Connector</md-button>
-      <md-button class="md-raised md-accent" @click="deployFutureEthToken">Deploy Future Eth Token</md-button>
+        </md-card-header>
+
+
+        <md-card-content>
+
+          <md-table>
+            <md-table-row>
+              <md-table-head>Currency</md-table-head>
+              <md-table-head>Pool</md-table-head>
+              <md-table-head>Value</md-table-head>
+            </md-table-row>
+
+            <md-table-row>
+              <md-table-cell>
+                <img src="https://testnet.aave.com/static/media/eth.1a64eee6.svg"
+                     style="height: 24px; margin-right: 3px;"> ETH
+              </md-table-cell>
+              <md-table-cell>Aave</md-table-cell>
+              <md-table-cell><b>0</b></md-table-cell>
+
+            </md-table-row>
+
+            <md-table-row>
+              <md-table-cell>
+                <img src="https://testnet.aave.com/static/media/dai.59d423e0.svg"
+                     style="height: 24px; margin-right: 3px; margin-top: -3px;"> DAI
+              </md-table-cell>
+              <md-table-cell>Aave</md-table-cell>
+              <md-table-cell><b>0</b></md-table-cell>
+            </md-table-row>
+          </md-table>
+
+
+        </md-card-content>
+      </md-ripple>
+    </md-card>
+
     </div>
+
+
+
+    <!--<div>-->
+      <!--<md-button class="md-raised md-accent" @click="deployAaveEthExternalPool">Deploy Aave Eth Pool Connector</md-button>-->
+      <!--<md-button class="md-raised md-accent" @click="deployFutureEthToken">Deploy Future Eth Token</md-button>-->
+    <!--</div>-->
 
 
   </div>
