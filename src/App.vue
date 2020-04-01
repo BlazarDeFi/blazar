@@ -40,7 +40,7 @@
         </md-tab>
         </md-tabs>
 
-        <a href="https://github.com/alice-si/future-tokens" target="_blank" style="color: white;">
+        <a href="https://github.com/BlazarDeFi/blazar" target="_blank" style="color: white;">
           <i class="fa fa-github" style="font-size:32px"></i>
         </a>
       </div>

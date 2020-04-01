@@ -1,9 +1,9 @@
 # Overview
 
-DAJ - Get your future interest at warp velocity
+Blazar - Get your future interest at warp velocity
 
-- <a href="https://daj.kubawo.now.sh/" target="_blank">Live demo</a>
-- Daj was an ETHLondon finalist. Read the <a href="https://devpost.com/software/daj-get-your-future-interest-right-now" target="_blank">Devpost write-up</a> 
+- <a href="https://blazar.now.sh" target="_blank">Live demo</a>
+- Blazar was an ETHLondon finalist. Read the <a href="https://devpost.com/software/daj-get-your-future-interest-right-now" target="_blank">Devpost write-up</a>
 
 
 # Building
