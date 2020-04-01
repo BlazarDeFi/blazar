@@ -1,6 +1,7 @@
 <template>
   <md-app id="app">
     <md-app-toolbar class="md-primary">
+      <img class="app-logo" src="/static/blazar.png"/>
       <span class="md-title">BLAZAR</span>
 
 
@@ -152,6 +153,10 @@
 
   .md-app-container {
     overflow-x: hidden;
+  }
+
+  img.app-logo {
+    height: 40px;
   }
 
 </style>
