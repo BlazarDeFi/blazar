@@ -86,7 +86,7 @@
     <md-dialog :md-active.sync="showModal">
       <div class="container">
         <img src="https://i.giphy.com/media/xT8qB50yhFINpFTymI/giphy.webp" alt="Snow" style="width:100%;">
-        <div class="image-overlay">Transferring your interests from the future ...</div>
+        <div class="image-overlay">Transferring your interest from the future ...</div>
       </div>
     </md-dialog>
 
