@@ -6,7 +6,8 @@ var MockDai = artifacts.require("MockDaiToken");
 require("./test-setup");
 
 contract('Future token DAI', function ([owner, oracle]) {
-  var ft, currentPeriod, pool, dai;
+  var ft, pool, dai;
+  var currentPeriod, period1plus, period6plus;
 
   before("deploy future token", async function () {
     pool = await MockPool.new();
@@ -22,8 +23,10 @@ contract('Future token DAI', function ([owner, oracle]) {
 
 
   it("should calculate correct period", async function () {
-    currentPeriod = await ft.getCurrentPeriod();
-    currentPeriod.should.be.bignumber.equal("2");
+    currentPeriod = parseInt(await ft.getCurrentPeriod());
+    period6plus = currentPeriod + 6;
+    period1plus = currentPeriod + 1;
+    console.log("Current period: " + currentPeriod + " in 6 months: " + period6plus);
   });
 
 
@@ -39,7 +42,7 @@ contract('Future token DAI', function ([owner, oracle]) {
 
     await ft.deposit(100, 0);
 
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal('100');
+    (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal('100');
     (await ft.getTotalInterests()).should.be.bignumber.equal('0');
 
     (await ft.getTotalCollateral()).should.be.bignumber.equal('100');
@@ -48,23 +51,23 @@ contract('Future token DAI', function ([owner, oracle]) {
 
 
   it("should withdraw money", async function () {
-    await ft.withdraw(50, 2);
+    await ft.withdraw(50, currentPeriod);
 
     //Depositor
     (await dai.balanceOf(owner)).should.be.bignumber.equal('50');
     //Pool
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal('50');
+    (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal('50');
     (await ft.getTotalCollateral()).should.be.bignumber.equal('50');
     (await dai.balanceOf(pool.address)).should.be.bignumber.equal('50');
   });
 
 
   it("should warp money to future", async function () {
-    await ft.warp(50, 2, 8);
+    await ft.warp(50, currentPeriod, period6plus);
 
     //Future tokens
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal('0');
-    (await ft.balanceOf(owner, 8)).should.be.bignumber.equal('50');
+    (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal('0');
+    (await ft.balanceOf(owner, period6plus)).should.be.bignumber.equal('50');
     //Depositor
     (await dai.balanceOf(owner)).should.be.bignumber.equal('53');
     //Pool
@@ -73,12 +76,13 @@ contract('Future token DAI', function ([owner, oracle]) {
   });
 
 
+
   it("should warp money to present", async function () {
-    await ft.warp(50, 8, 3);
+    await ft.warp(50, period6plus, period1plus);
 
     //Future tokens
-    (await ft.balanceOf(owner, 3)).should.be.bignumber.equal('50');
-    (await ft.balanceOf(owner, 8)).should.be.bignumber.equal('0');
+    (await ft.balanceOf(owner, period1plus)).should.be.bignumber.equal('50');
+    (await ft.balanceOf(owner, period6plus)).should.be.bignumber.equal('0');
     //Depositor
     (await dai.balanceOf(owner)).should.be.bignumber.equal('51');
     //Pool
@@ -88,11 +92,11 @@ contract('Future token DAI', function ([owner, oracle]) {
 
 
   it("should withdraw rest of the money", async function () {
-    await ft.withdraw(50, 3);
+    await ft.withdraw(50, period1plus);
 
     //Future tokens
-    (await ft.balanceOf(owner, 3)).should.be.bignumber.equal('0');
-    (await ft.balanceOf(owner, 8)).should.be.bignumber.equal('0');
+    (await ft.balanceOf(owner, period1plus)).should.be.bignumber.equal('0');
+    (await ft.balanceOf(owner, period6plus)).should.be.bignumber.equal('0');
     //Depositor
     (await dai.balanceOf(owner)).should.be.bignumber.equal('100');
     //Pool

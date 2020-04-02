@@ -6,7 +6,8 @@ const ETH_ADDRESS = "0x000000000000000000000000000000000000000E";
 require("./test-setup");
 
 contract('Future token ETH', function ([owner, oracle]) {
-  var ft, currentPeriod, pool;
+  var ft, pool;
+  var currentPeriod, period1plus, period5plus;
 
   before("deploy future token", async function () {
     pool = await MockPool.new(ETH_ADDRESS);
@@ -21,8 +22,9 @@ contract('Future token ETH', function ([owner, oracle]) {
 
 
   it("should calculate correct period", async function () {
-    currentPeriod = await ft.getCurrentPeriod();
-    currentPeriod.should.be.bignumber.equal("2");
+    currentPeriod = parseInt(await ft.getCurrentPeriod());
+    period5plus = currentPeriod + 5;
+    period1plus = currentPeriod + 1;
   });
 
 
@@ -40,7 +42,7 @@ contract('Future token ETH', function ([owner, oracle]) {
 
     await ft.deposit(100, 0, {value: 100});
 
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("100");
+    (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal("100");
     (await ft.getTotalInterests()).should.be.bignumber.equal("0");
 
     //External pool
@@ -50,11 +52,11 @@ contract('Future token ETH', function ([owner, oracle]) {
 
 
   it("should warp money forward", async function () {
-    await ft.warp(100, 2, 7);
+    await ft.warp(100, currentPeriod, period5plus);
 
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("0");
+    (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal("0");
     (await ft.getTotalInterests()).should.be.bignumber.equal("5");
-    (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("100");
+    (await ft.balanceOf(owner, period5plus)).should.be.bignumber.equal("100");
 
     //External pool
     (await ft.getTotalCollateral()).should.be.bignumber.equal("95");
@@ -63,11 +65,11 @@ contract('Future token ETH', function ([owner, oracle]) {
 
 
   it("should warp money backward", async function () {
-    await ft.warp(80, 7, 2, {value: 4});
+    await ft.warp(80, period5plus, currentPeriod, {value: 4});
 
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("80");
+    (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal("80");
     (await ft.getTotalInterests()).should.be.bignumber.equal("1");
-    (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("20");
+    (await ft.balanceOf(owner, period5plus)).should.be.bignumber.equal("20");
 
     //External pool
     (await ft.getTotalCollateral()).should.be.bignumber.equal("99");
@@ -76,19 +78,19 @@ contract('Future token ETH', function ([owner, oracle]) {
 
 
   it("should withdraw the money from current period", async function () {
-    await ft.withdraw(80, 2);
+    await ft.withdraw(80, currentPeriod);
 
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("0");
-    (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("20");
+    (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal("0");
+    (await ft.balanceOf(owner, period5plus)).should.be.bignumber.equal("20");
     (await ft.getTotalInterests()).should.be.bignumber.equal("1");
   });
 
 
   it("should withdraw the money from past period", async function () {
-    await ft.withdraw(20, 7, {value: 1});
+    await ft.withdraw(20, period5plus, {value: 1});
 
-    (await ft.balanceOf(owner, 2)).should.be.bignumber.equal("0");
-    (await ft.balanceOf(owner, 7)).should.be.bignumber.equal("0");
+    (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal("0");
+    (await ft.balanceOf(owner, period5plus)).should.be.bignumber.equal("0");
     (await ft.getTotalInterests()).should.be.bignumber.equal("0");
   });
 
