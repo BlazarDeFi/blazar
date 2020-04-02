@@ -23,11 +23,22 @@ contract FutureToken is IERC1155, IAssetBacked {
 
   /**
   * @dev emitted after the redeem action
-  * @param _from the address performing the redeem
+  * @param _account the address performing the redeem
   * @param _value the amount to be redeemed
+  * @param _period the amount to be redeemed
   * @param _value interests received
   **/
-  event Deposit(address indexed _from, uint256 _value, uint256 _interests);
+  event Deposit(address indexed _account, uint256 _value, uint256 _period, uint256 _interests);
+
+  /**
+  * @dev emitted after the redeem action
+  * @param _account the address performing the redeem
+  * @param _value the amount to be redeemed
+  * @param _from start maturity date
+  * @param _to destination maturity date
+  * @param _value interests received
+  **/
+  event TimeTravel(address indexed _account, uint256 _value, uint256 _from, uint256 _to, uint256 _interests);
 
   modifier onlyInterestRatesOracle() {
     require(msg.sender == interestRatesOracle, "The caller is not the interest rates oracle");
@@ -83,7 +94,7 @@ contract FutureToken is IERC1155, IAssetBacked {
     _mint(msg.sender, currentPeriod.add(periodDiff), _amount);
     _mint(msg.sender, INTERESTS_SLOT, interests);
 
-    emit Deposit(msg.sender, _amount, interests);
+    emit Deposit(msg.sender, _amount, periodDiff, interests);
   }
 
 
@@ -105,11 +116,12 @@ contract FutureToken is IERC1155, IAssetBacked {
   }
 
   function warp(uint256 _amount, uint256 _periodFrom, uint256 _periodTo) external payable {
-    _warp(msg.sender, _amount, _periodFrom, _periodTo);
+    uint256 interests = _warp(msg.sender, _amount, _periodFrom, _periodTo);
+    emit TimeTravel(msg.sender, _amount, _periodFrom, _periodTo, interests);
   }
 
 
-  function _warp(address payable _account, uint256 _amount, uint256 _periodFrom, uint256 _periodTo) internal {
+  function _warp(address payable _account, uint256 _amount, uint256 _periodFrom, uint256 _periodTo) internal returns(uint256) {
     require(this.balanceOf(_account, _periodFrom) >= _amount, "No enough funds available");
     require(_periodTo >= this.getCurrentPeriod(), "Cannot transfer to the past");
 
@@ -136,6 +148,7 @@ contract FutureToken is IERC1155, IAssetBacked {
     balances[_periodTo][msg.sender] = balances[_periodTo][msg.sender].add(_amount);
 
     emit TransferSingle(msg.sender, msg.sender, msg.sender, _periodTo, _amount);
+    return warpPrice;
   }
 
   function getCurrentPeriod() external view returns(uint256) {
