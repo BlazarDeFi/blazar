@@ -18,7 +18,8 @@ let state = {
       precision: 2,
       balance: 0
     }
-  }
+  },
+  myActions: []
 };
 
 export default state;

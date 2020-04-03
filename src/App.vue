@@ -15,16 +15,16 @@
           </md-tab>
 
           <md-tab
-            key="arrow"
-            to="/"
-            md-label="->"
-            exact>
-          </md-tab>
-
-          <md-tab
             key="future"
             to="/future"
             md-label="Future tokens"
+            exact>
+
+          </md-tab>
+          <md-tab
+            key="history"
+            to="/history"
+            md-label="History"
             exact>
 
           </md-tab>

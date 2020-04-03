@@ -1,5 +1,6 @@
 import {getFutureToken, getBackingToken} from "./contracts.js";
 import {getMainAccount} from "./network";
+import state from "@/state";
 
 const SCALING_FACTOR = 1;
 const CURRENCIES = ['ETH'];
@@ -89,5 +90,38 @@ export async function getBalances() {
   var balances = {};
   balances['ETH'] = await getBalance(main, 'ETH');
   balances['DAI'] = await getBalance(main, 'DAI');
+
   return balances;
 }
+
+async function getDepositsForCurrency(_currency) {
+
+  let ft = await getFutureToken(_currency);
+  let main = await getMainAccount();
+  let depositEvents = await ft.getPastEvents('Deposit', {
+    _account: main,
+    fromBlock: 0,
+    toBlock: 'latest'
+  });
+  console.log(depositEvents);
+  depositEvents.forEach( event => {
+    state.myActions.push({
+      label: "New deposit",
+      time: event.blockNumber,
+      amount: web3.fromWei(event.returnValues._value, 'ether'),
+      maturity: event.returnValues._period,
+      interest: web3.fromWei(event.returnValues._interests, 'ether'),
+      currency: state.currencies[_currency.toLowerCase()],
+      tx: event.transactionHash
+    });
+  });
+}
+
+export async function getHistory() {
+  console.log("Getting history...");
+  state.myActions.splice(0, state.myActions.length);
+  await getDepositsForCurrency('ETH');
+  await getDepositsForCurrency('DAI');
+}
+
+

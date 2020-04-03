@@ -54,6 +54,10 @@ async function setupFilters() {
       return val.toFixed(2) + " " + currency.title;
     }
   })
+  Vue.filter('tx', function (value) {
+    if (!value) return '';
+    return value.substr(0,6) + "..." + value.substr(value.length - 4);
+  })
 };
 
 setupFilters();
