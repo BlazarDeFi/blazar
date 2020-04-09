@@ -15,7 +15,7 @@
               <md-card-header-text>
                 <div class="md-title">Future tokens</div>
                 <div class="md-subhead">
-                  Check when your funds become available -> Each red dot indicates when your fTokens are redeemable.<br/>
+                  Each red dot indicates when your fTokens are redeemable.<br/>
                   Click on each one to transfer them or change their maturity date.
                 </div>
               </md-card-header-text>
