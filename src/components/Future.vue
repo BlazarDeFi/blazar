@@ -134,7 +134,7 @@
                   </span>
               </div>
 
-              <div style="font-size: 14px; color:red" v-if="price == 0">
+              <div style="font-size: 14px; color:red" v-if="price === 0">
                 Please select the target period
               </div>
 

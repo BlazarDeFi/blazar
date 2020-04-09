@@ -99,7 +99,8 @@ async function getDepositsForCurrency(_currency) {
   let ft = await getFutureToken(_currency);
   let main = await getMainAccount();
   let depositEvents = await ft.getPastEvents('Deposit', {
-    _account: main,
+    address: ft.address,
+    filter: {_account: main},
     fromBlock: 0,
     toBlock: 'latest'
   });
