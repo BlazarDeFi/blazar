@@ -45,7 +45,7 @@
 
       </div>
 
-      <div class="md-layout-item md-size-25">
+      <div class="md-layout-item md-size-28">
 
       <div style="font-size: 36px; margin-bottom: 30px; margin-top: 40px;">Current rates: </div>
 
@@ -54,7 +54,7 @@
           <md-card-header-text>
             <div class="md-title">ETH</div>
             <div class="md-subhead"><b>{{currencies.eth.rate}}%</b> APY</div>
-            Balance: <b>{{currencies.eth.balance | fullEthToUsd}}</b>
+            Your balance: <b>{{currencies.eth.balance | fullEthToUsd}}</b>
           </md-card-header-text>
 
           <md-card-media>
@@ -69,7 +69,7 @@
           <md-card-header-text>
             <div class="md-title">DAI</div>
             <div class="md-subhead"><b>{{currencies.dai.rate}}%</b> APY</div>
-            Balance: <b>{{currencies.dai.balance.toFixed(2)}} </b>
+            Your balance: <b>{{currencies.dai.balance.toFixed(2)}} </b>
           </md-card-header-text>
 
           <md-card-media>
