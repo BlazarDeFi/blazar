@@ -22,13 +22,22 @@ contract FutureToken is IERC1155, IAssetBacked {
   address public constant ETHER = address(0xE);
 
   /**
-  * @dev emitted after the redeem action
-  * @param _account the address performing the redeem
-  * @param _value the amount to be redeemed
-  * @param _period the amount to be redeemed
-  * @param _value interests received
+  * @dev emitted after the deposit action
+  * @param _account the address depositing
+  * @param _value the amount to be deposited
+  * @param _period of the deposit
+  * @param _interests interests received
   **/
   event Deposit(address indexed _account, uint256 _value, uint256 _period, uint256 _interests);
+
+  /**
+  * @dev emitted after the withdraw action
+  * @param _account the address performing the withdrawal
+  * @param _value the amount to be withdrawn
+  * @param _period of the withdrawn funds
+  * @param _interests repaid
+  **/
+  event Withdraw(address indexed _account, uint256 _value, uint256 _period, uint256 _interests);
 
   /**
   * @dev emitted after the redeem action
