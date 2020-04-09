@@ -120,7 +120,7 @@
               </range-slider>
 
 
-              <div style="font-size: 14px;" v-if="price >= 0">
+              <div style="font-size: 14px;" v-if="price > 0">
                 You will receive:
                 <span style="color: green;">
                   <b>{{price | formatCurrency(selectedCurrency)}}</b>
@@ -132,6 +132,10 @@
                   <span style="color: red;">
                     <b>{{price | formatCurrency(selectedCurrency)}}</b>
                   </span>
+              </div>
+
+              <div style="font-size: 14px; color:red" v-if="price == 0">
+                Please select the target period
               </div>
 
 
@@ -149,7 +153,7 @@
           </md-tabs>
 
           <div style="text-align: center; margin-top: 10px;">
-            <md-button class="md-primary md-raised" @click="executeTransfer()">Transfer</md-button>
+            <md-button class="md-primary md-raised" @click="executeTransfer()" :disabled="transferTab==='timeTab' && price === 0">Transfer</md-button>
           </div>
 
         </div>
