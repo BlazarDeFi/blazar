@@ -174,6 +174,16 @@
       </div>
     </md-dialog>
 
+    <md-dialog :md-active.sync="showWithdrawalModal" style="height: 320px;">
+      <div class="container">
+        <img src="https://46.media.tumblr.com/561d3c7b20c0b5263f57bb476b831710/tumblr_inline_nzs8f6PS2J1tuh146_500.gif" alt="Snow" style="width:100%;">
+        <div class="image-overlay">Withdrawing tokens ...</div>
+      </div>
+    </md-dialog>
+
+
+
+
 
   </div>
 </template>
@@ -204,6 +214,7 @@
         value: 0,
         showSpaceTransferModal: false,
         showTimeTransferModal: false,
+        showWithdrawalModal: false,
         timeTarget: 0,
         transferTab: "spaceTab"
       }
@@ -277,9 +288,9 @@
       withdraw: async function () {
         console.log("Withdraw: " + this.value);
         this.showTransferDialog = false;
-        this.showSpaceTransferModal = true;
+        this.showWithdrawalModal = true;
         await withdraw(this.value, this.selectedPeriod, this.selectedCurrency.title);
-        this.showSpaceTransferModal = false;
+        this.showWithdrawalModal = false;
         this.balances = await getBalances();
       },
       setMaxValue: function () {
