@@ -25,6 +25,11 @@ export default new Router({
       path: '/history',
       name: 'history',
       component: History
+    },
+    {
+      path: '/stats',
+      name: 'stats',
+      component: Stats
     }
   ]
 })
