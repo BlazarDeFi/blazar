@@ -57,9 +57,17 @@ export async function timeTransfer(_to, _id, _amount, _currency) {
 
 export async function withdraw(_amount, _from, _currency) {
   console.log("Withdraw: " + _amount);
-  let fc = await getFutureToken(_currency);
+  let ft = await getFutureToken(_currency);
   let wei = web3.toWei(_amount / SCALING_FACTOR, 'ether');
-  let tx = await fc.withdraw(wei, _from);
+  var tx;
+  if (_currency === 'ETH') {
+    let period = _from - 3;
+    let price = await ft.getWarpPrice(wei, period);
+    console.log("Withdrawal price for period: " + period +" : " + web3.toWei(price, 'ether'));
+    tx = await ft.withdraw(wei, _from, {value: price});
+  } else {
+    tx = await ft.withdraw(wei, _from);
+  }
 
   console.log(tx);
 }
@@ -95,7 +103,6 @@ export async function getBalances() {
 }
 
 async function getDepositsForCurrency(_currency) {
-
   let ft = await getFutureToken(_currency);
   let main = await getMainAccount();
   let depositEvents = await ft.getPastEvents('Deposit', {
@@ -118,11 +125,38 @@ async function getDepositsForCurrency(_currency) {
   });
 }
 
+
+async function getTimeTravelsForCurrency(_currency) {
+  let ft = await getFutureToken(_currency);
+  let main = await getMainAccount();
+  let timeTravelEvents = await ft.getPastEvents('TimeTravel', {
+    address: ft.address,
+    filter: {_account: main},
+    fromBlock: 0,
+    toBlock: 'latest'
+  });
+  console.log(timeTravelEvents);
+  timeTravelEvents.forEach( event => {
+    state.myActions.push({
+      label: "Time travel",
+      time: event.blockNumber,
+      amount: web3.fromWei(event.returnValues._value, 'ether'),
+      maturity: event.returnValues._from + "->" + event.returnValues._to,
+      interest: web3.fromWei(event.returnValues._interests, 'ether'),
+      currency: state.currencies[_currency.toLowerCase()],
+      tx: event.transactionHash
+    });
+  });
+}
+
 export async function getHistory() {
   console.log("Getting history...");
   state.myActions.splice(0, state.myActions.length);
   await getDepositsForCurrency('ETH');
   await getDepositsForCurrency('DAI');
+
+  await getTimeTravelsForCurrency('ETH');
+  await getTimeTravelsForCurrency('DAI');
 }
 
 
