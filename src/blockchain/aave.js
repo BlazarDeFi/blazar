@@ -25,8 +25,7 @@ export async function getReserveData() {
   let pool = await getLendingPool();
   let data = await pool.getReserveData(deployment.RESERVE);
 
-
-  console.log(data.liquidityRate.toString());
+  console.log("Aave deposit rate: " + data.liquidityRate.toString());
 }
 
 export async function depositDai() {
@@ -35,8 +34,8 @@ export async function depositDai() {
   let wei = web3.toWei(1, 'ether');
   let tx = await pool.deposit(deployment.DAI_RESERVE, wei, 0);
   console.log(tx);
-
 }
+
 
 
 

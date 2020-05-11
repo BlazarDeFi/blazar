@@ -119,7 +119,7 @@
   import {getLendingData, makeDeposit} from '@/blockchain/futureToken'
   import {getLendingConfig, getReserveData, depositDai} from '@/blockchain/aave'
   import {deployAaveExternalPool, deployFutureEthToken} from '@/blockchain/deployer'
-  import {getTreasures, ethToUsd} from '@/blockchain/stats'
+  import {getTreasures} from '@/blockchain/stats'
 
 
   export default {
@@ -130,15 +130,7 @@
       }
     },
     methods: {
-      deployAaveEthExternalPool: async function () {
-        await deployAaveExternalPool();
-      },
-      deployFutureEthToken: async function () {
-        await deployFutureEthToken();
-      },
-      ethToUsd: async function(val) {
-        return await ethToUsd(val);
-      }
+
     },
     beforeCreate: async function () {
       this.treasure = await getTreasures();

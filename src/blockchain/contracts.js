@@ -6,6 +6,7 @@ import AAVE_EXTERNAL_POOL_JSON from '@contracts/AaveExternalPool.json'
 import FUTURE_TOKEN_JSON from '@contracts/FutureToken.json'
 import IR_STRATEGY_JSON from '@contracts/DefaultReserveInterestRateStrategy.json'
 import ERC20_JSON from '@contracts/ERC20.json'
+import CHAINLINK_JSON from '@contracts/AggregatorInterface.json'
 
 import deployment from './deployment.json';
 
@@ -21,12 +22,16 @@ var setup = async function(json) {
   return c;
 };
 
-var ir, dai, pool;
+var ir, dai, pool, chainLinkEth;
 let ft = {};
 let bt = {};
 
 export async function getFUTURE_TOKEN() {
   return await setup(FUTURE_TOKEN_JSON);
+}
+
+export async function getCHAINLINK() {
+  return await setup(CHAINLINK_JSON);
 }
 
 export async function getAAVE_EXTERNAL_POOL() {
@@ -95,6 +100,16 @@ export async function getDaiToken() {
     console.log("Linked dai token: " + dai.address);
   }
   return dai;
+}
+
+
+export async function getChainLinkEth() {
+  if (chainLinkEth === undefined) {
+    let CHAINLINK = await getCHAINLINK();
+    chainLinkEth = await CHAINLINK.at(deployment.CHAINLINK_ETH_USD);
+    console.log("Linked chainlink-eth-usd: " + chainLinkEth.address);
+  }
+  return chainLinkEth;
 }
 
 

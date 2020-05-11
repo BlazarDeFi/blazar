@@ -49,6 +49,10 @@ contract FutureToken is IERC1155, IAssetBacked {
   **/
   event TimeTravel(address indexed _account, uint256 _value, uint256 _from, uint256 _to, uint256 _interests);
 
+  /**
+  * @dev annotated function may only be called by the interest rates oracle
+  * which is set once during the contract creation
+  **/
   modifier onlyInterestRatesOracle() {
     require(msg.sender == interestRatesOracle, "The caller is not the interest rates oracle");
     _;
@@ -56,6 +60,7 @@ contract FutureToken is IERC1155, IAssetBacked {
 
   mapping (uint256 => mapping(address => uint256)) internal balances;
 
+  //An external lending pool that is being used as a stopgap for outstanding deposits
   IExternalPool public externalPool;
 
   //An oracle authorized to set interest rates

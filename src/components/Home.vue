@@ -98,9 +98,8 @@
 <script>
   import { getLendingData, makeDeposit} from '@/blockchain/futureToken'
   import { getLendingConfig, getReserveData, depositDai } from '@/blockchain/aave'
-  import { deployFutureToken} from '@/blockchain/deployer'
   import { getBalances} from '@/blockchain/wallet'
-  import { getRates, calculateInterest } from '@/blockchain/stats'
+  import { getDepositRates, calculateInterest } from '@/blockchain/stats'
   import State from '@/state'
   import RangeSlider from 'vue-range-slider'
   import 'vue-range-slider/dist/vue-range-slider.css'
@@ -134,9 +133,8 @@
       }
     },
     beforeCreate: async function () {
-      window.redeploy = deployFutureToken;
       await getBalances();
-      await getRates();
+      await getDepositRates();
       this.onCurrencyChange();
 
     },
@@ -150,10 +148,6 @@
       },
       getData: async function () {
         await getReserveData();
-      },
-      deployProxy: async function () {
-        console.log("Deploying FT");
-        await deployFutureToken();
       },
       makeDeposit: async function () {
         this.showModal = true;

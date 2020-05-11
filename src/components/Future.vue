@@ -196,7 +196,7 @@
   import {getBalances, spaceTransfer, timeTransfer, withdraw} from '@/blockchain/futureToken'
   import {getLendingConfig, getReserveData} from '@/blockchain/aave'
   import {deployFutureCoin} from '@/blockchain/deployer'
-  import { calculateInterest, getRates } from '@/blockchain/stats'
+  import { calculateInterest, getDepositRates } from '@/blockchain/stats'
   import RangeSlider from 'vue-range-slider'
   import State from '@/state'
   import 'vue-range-slider/dist/vue-range-slider.css'
@@ -239,7 +239,7 @@
     },
     beforeCreate: async function () {
       this.balances = await getBalances();
-      await getRates();
+      await getDepositRates();
     },
     methods: {
       transfer(val, period, currency) {
