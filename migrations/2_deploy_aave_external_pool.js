@@ -2,8 +2,6 @@ var AaveKovanDeployment = artifacts.require("./AaveKovanDeployment.sol");
 var AaveExternalPool = artifacts.require("./AaveExternalPool.sol");
 
 
-
-
 module.exports = function(deployer) {
   deployer.deploy(AaveKovanDeployment);
   deployer.link(AaveKovanDeployment, AaveExternalPool);
