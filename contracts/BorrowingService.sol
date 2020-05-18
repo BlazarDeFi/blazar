@@ -1,18 +1,22 @@
 pragma solidity ^0.5.0;
 
 import "./IExternalPool.sol";
+import "./IAssetBacked.sol";
 import "./IAssetsPriceProvider.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 
 /***
   @title BorrowingService
   @notice A contract handling assets borrowing and collateral management
 */
 
-contract BorrowingService is Ownable {
+contract BorrowingService is Ownable, IAssetBacked {
 
   using SafeMath for uint256;
+
+  address public constant ETHER = address(0xE);
 
 
   /**
@@ -61,6 +65,23 @@ contract BorrowingService is Ownable {
   }
 
 
+
+  function borrow(uint256 _loanAmount, address _collateralAddress) external payable {
+    uint256 collateralAmount = getRequiredCollateral(_collateralAddress, _loanAmount);
+
+    if (this.isEthBacked()) {
+      require(msg.value >= collateralAmount, "Not enough ether attached to the transaction");
+      externalPool.deposit.value(collateralAmount)(collateralAmount);
+    } else {
+//      //Implement token collateral
+////      IERC20(originalAsset).transferFrom(msg.sender, address(externalPool), lendingPoolDeposit);
+////      externalPool.deposit(lendingPoolDeposit);
+    }
+    externalPool.borrow(_loanAmount, originalAsset, msg.sender);
+  }
+
+
+
   /**
   * @dev Sets the current interest rate based:
   * on current deposits, loans, reserve and external pools rats
@@ -81,7 +102,6 @@ contract BorrowingService is Ownable {
 
   }
 
-
   function getCollateralRatio(address _collateralAddress) public view returns (uint256) {
     return collateralRatios[_collateralAddress];
   }
@@ -94,6 +114,15 @@ contract BorrowingService is Ownable {
     uint256 loanValue = _loanAmount.mul(assetsPriceProvider.getAssetPrice(originalAsset));
     uint256 collateralValue = loanValue.mul(getCollateralRatio(_collateralAddress)).div(100);
     return collateralValue.div(assetsPriceProvider.getAssetPrice(_collateralAddress));
+  }
+
+
+  function isEthBacked() external view returns(bool) {
+    return true;
+  }
+
+  function backingAsset() external view returns(IERC20) {
+    return IERC20(ETHER);
   }
 
 

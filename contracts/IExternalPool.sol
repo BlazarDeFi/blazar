@@ -11,5 +11,7 @@ interface IExternalPool {
 
   function withdraw(uint256 amount, address payable beneficiary) external;
 
+  function borrow(uint256 loanAmount, address loanAsset, address beneficiary) external;
+
   function totalBalance() external view returns(uint256);
 }

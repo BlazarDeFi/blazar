@@ -8,7 +8,7 @@ const ETH_ADDRESS = "0x000000000000000000000000000000000000000E";
 
 require("./test-setup");
 
-contract('Borrowing service', function ([owner, oracle]) {
+contract('Borrowing service', function ([owner, oracle, borrower]) {
   var borrowing, pool, dai, priceProvider;
 
   before("deploy borrowing service", async function () {
@@ -46,6 +46,18 @@ contract('Borrowing service', function ([owner, oracle]) {
     // Collateral value = 2000USD * 150% = 3000
     // Collateral amount = 3000USD / 100USD/eth = 30 ETH
     (await borrowing.getRequiredCollateral(ETH_ADDRESS, 1000)).should.be.bignumber.equal("30");
+  });
+
+
+  it("should borrow funds", async function () {
+    await dai.mint(pool.address, 1000);
+    (await dai.balanceOf(pool.address)).should.be.bignumber.equal('1000');
+
+    await borrowing.borrow(1000, dai.address, ETH_ADDRESS, {value: 30, from: borrower});
+
+    (await web3.eth.getBalance(pool.address)).should.be.equal("30");
+    (await dai.balanceOf(borrower)).should.be.bignumber.equal('1000');
+
   });
 
 

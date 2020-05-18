@@ -14,6 +14,8 @@ import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 */
 contract AaveExternalPool is BaseExternalPool, Ownable {
 
+  enum InterestRateMode {NONE, STABLE, VARIABLE}
+
   LendingPool public lendingPool;
 
   mapping(address => address) internal tokenReserves;
@@ -43,6 +45,17 @@ contract AaveExternalPool is BaseExternalPool, Ownable {
       lendingPool.deposit.value(amount)(reserve(), amount, 0);
     } else {
       lendingPool.deposit(reserve(), amount, 0);
+    }
+  }
+
+  function borrow(uint256 loanAmount, address loanAsset, address beneficiary) external {
+    address borrowingReserve = tokenReserves[loanAsset];
+
+    if (isEthBacked()) {
+      lendingPool.borrow(borrowingReserve, loanAmount, uint256(InterestRateMode.STABLE), 0);
+      IERC20(loanAsset).transfer(beneficiary, loanAmount);
+    } else {
+      //TODO handle non-ether collateral
     }
   }
 

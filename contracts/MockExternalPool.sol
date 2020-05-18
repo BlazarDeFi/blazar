@@ -24,6 +24,14 @@ contract MockExternalPool is BaseExternalPool {
     }
   }
 
+  function borrow(uint256 loanAmount, address loanAsset, address beneficiary) external {
+    if (isEthBacked()) {
+      IERC20(loanAsset).transfer(beneficiary, loanAmount);
+    } else {
+      revert("Only ETH collateral is supported");
+    }
+}
+
   function totalBalance() external view returns(uint256) {
     return balance;
   }

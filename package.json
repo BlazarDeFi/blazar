@@ -19,6 +19,7 @@
     "bn.js": "^5.1.1",
     "chart.js": "^2.9.3",
     "erc-1155": "git+https://github.com/enjin/erc-1155.git",
+    "ethers": "^4.0.47",
     "solidity-docgen": "^0.3.13",
     "truffle-contract": "^4.0.31",
     "vue": "^2.5.2",
