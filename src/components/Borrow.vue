@@ -71,7 +71,7 @@
     <md-dialog :md-active.sync="showModal">
       <div class="container">
         <img src="https://i.giphy.com/media/xT8qB50yhFINpFTymI/giphy.webp" alt="Snow" style="width:100%;">
-        <div class="image-overlay">Transferring your interest from the future ...</div>
+        <div class="image-overlay">Processing your loan application...</div>
       </div>
     </md-dialog>
 
@@ -82,7 +82,7 @@
 
 <script>
   import { getLendingData, makeDeposit} from '@/blockchain/futureToken'
-  import { getBorrowingRate} from '@/blockchain/borrowing'
+  import { getBorrowingRate, borrow} from '@/blockchain/borrowing'
   import { getBalances} from '@/blockchain/wallet'
   import { getDepositRates, calculateInterest, calculateCollateral, calculateMaxLoan } from '@/blockchain/stats'
   import State from '@/state'
@@ -144,17 +144,9 @@
       borrow: async function () {
         this.showModal = true;
         try {
-          await makeDeposit(this.deposit, this.time, this.selectedCurrency.title);
+          await borrow(this.loan, this.time, this.selectedCurrency.title, this.collateralCurrency.title);
           this.$router.push({path: '/future'});
-          let interestText = this.selectedCurrency.title == 'ETH'
-            ? this.$options.filters.ethToUsd(this.interest)
-            : (this.interest + " " + this.selectedCurrency.title);
-          let toast = this.$toasted.show("You've just earned " + interestText + " interests !", {
-            theme: "bubble",
-            position: "top-center",
-            duration : 5000,
-            icon : 'sentiment_satisfied_alt'
-          });
+          await getBalances();
         } finally {
           this.showModal = false;
         }
