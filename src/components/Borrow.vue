@@ -8,7 +8,7 @@
 
       <div class="md-layout-item md-size-70">
 
-        <div class="text">I want to borrow <span class="dinput">{{deposit.toFixed(2)}}</span>
+        <div class="text">I want to borrow <span class="dinput">{{loan.toFixed(2)}}</span>
           <v-select :options="Object.values(currencies)" label="title" v-model="selectedCurrency" @input="onCurrencyChange()">
             <template v-slot:option="option">
               {{ option.title }}
@@ -19,9 +19,9 @@
         <range-slider
           class="slider"
           min="0"
-          :max="maxDeposit"
+          :max="maxLoan"
           :step="step"
-          v-model="deposit">
+          v-model="loan">
         </range-slider>
 
         <div class="text">for <span class="dinput">{{time}}</span> months</div>
@@ -84,7 +84,7 @@
   import { getLendingData, makeDeposit} from '@/blockchain/futureToken'
   import { getBorrowingRate} from '@/blockchain/borrowing'
   import { getBalances} from '@/blockchain/wallet'
-  import { getDepositRates, calculateInterest, calculateCollateral } from '@/blockchain/stats'
+  import { getDepositRates, calculateInterest, calculateCollateral, calculateMaxLoan } from '@/blockchain/stats'
   import State from '@/state'
   import RangeSlider from 'vue-range-slider'
   import 'vue-range-slider/dist/vue-range-slider.css'
@@ -100,8 +100,8 @@
       return {
         showModal: false,
         currencies: State.currencies,
-        deposit: 0,
-        maxDeposit:0,
+        loan: 0,
+        maxLoan:0,
         time: 6,
         step: 0.01,
         precision: 3,
@@ -115,12 +115,12 @@
     computed: {
       // a computed getter
       interest: function () {
-        return calculateInterest(this.deposit, this.time, this.selectedCurrency);
+        return calculateInterest(this.loan, this.time, this.selectedCurrency);
       }
     },
     asyncComputed: {
       async collateral() {
-        return await calculateCollateral(this.deposit, this.time, this.selectedCurrency, this.collateralCurrency);
+        return await calculateCollateral(this.loan, this.time, this.selectedCurrency, this.collateralCurrency);
       }
     },
     beforeCreate: async function () {
@@ -130,10 +130,11 @@
 
     },
     methods: {
-      onCurrencyChange: function() {
+      onCurrencyChange: async function() {
         console.log("Currency changed: " + this.selectedCurrency.title);
-        this.deposit = this.selectedCurrency.balance / 2;
-        this.maxDeposit = this.selectedCurrency.balance;
+        this.maxLoan = await calculateMaxLoan(this.collateralCurrency.balance, this.selectedCurrency, this.collateralCurrency);
+
+        this.loan = this.maxLoan / 2;
         this.step = this.selectedCurrency.step;
         this.precision = this.selectedCurrency.precision;
       },

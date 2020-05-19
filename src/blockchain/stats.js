@@ -28,7 +28,7 @@ export async function getTreasures() {
 
 export async function getAssetPrice(currency) {
   let now = new Date().getTime();
-  if (lastCall[currency] === undefined || (lastCall[currency] && now - lastCall[currency] > 60000)) {
+  if (lastCall[currency] === undefined || (lastCall[currency] && now - lastCall[currency] > 300000)) {
     let chainLink = await getChainLink(currency);
     let rawPrice = await chainLink.latestAnswer();
     let price = rawPrice / CHAINLINK_PRECISION;
@@ -68,13 +68,28 @@ export function calculateInterest(amount, period, currency) {
 }
 
 export async function calculateCollateral(amount, period, borrowingCurrency, collateralCurrency) {
+  if (amount) {
+    let borrowingAssetPrice = await getAssetPrice(borrowingCurrency.title);
+    let collateralPrice = await getAssetPrice(collateralCurrency.title);
+
+    let loanValue = amount * borrowingAssetPrice;
+
+    let collateralValue = loanValue * 3;
+    let collateralAmount = collateralValue / collateralPrice;
+
+    return collateralAmount;
+  }
+}
+
+
+export async function calculateMaxLoan(maxCollateral, borrowingCurrency, collateralCurrency) {
   let borrowingAssetPrice = await getAssetPrice(borrowingCurrency.title);
   let collateralPrice =  await getAssetPrice(collateralCurrency.title);
 
-  let loanValue = amount * borrowingAssetPrice;
+  let collateralValue = maxCollateral * collateralPrice;
 
-  let collateralValue = loanValue * 3;
-  let collateralAmount = collateralValue / collateralPrice;
-  console.log("VAL: " + collateralAmount);
-  return collateralAmount;
+  let loanValue = collateralValue / 3;
+  let loanAmount = loanValue / borrowingAssetPrice;
+  console.log("Max loan amount: " + loanAmount);
+  return loanAmount;
 }
