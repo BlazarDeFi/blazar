@@ -1,4 +1,4 @@
-import {getFutureToken, getChainLinkEth } from "./contracts.js";
+import {getFutureToken, getChainLink } from "./contracts.js";
 import state from "@/state";
 
 
@@ -6,6 +6,10 @@ const CHAINLINK_PRECISION = 100000000;
 const SCALING_FACTOR = 1;
 const CURRENCIES = ['ETH'];
 const ETH_QUERY_URL = 'https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD&api_key=88ef2a2548eace3ed76a7b5f2999c24fd90a204df704d3773fc0c76caa587c52';
+
+var lastCall = {};
+var priceCache = {};
+
 
 async function getTreasure(currency) {
   let ft = await getFutureToken(currency);
@@ -23,21 +27,23 @@ export async function getTreasures() {
 
 
 export async function getAssetPrice(currency) {
-  let chainLink = await getChainLinkEth();
-  let rawPrice = await chainLink.latestAnswer();
-  let price = rawPrice / CHAINLINK_PRECISION;
-  console.log("Getting price from Chainlink for " + currency + " : " + price);
-  return price;
+  let now = new Date().getTime();
+  if (lastCall[currency] === undefined || (lastCall[currency] && now - lastCall[currency] > 60000)) {
+    let chainLink = await getChainLink(currency);
+    let rawPrice = await chainLink.latestAnswer();
+    let price = rawPrice / CHAINLINK_PRECISION;
+    console.log("Getting price from Chainlink for " + currency + " : " + price);
+    priceCache[currency] = price;
+    lastCall[currency] = now;
+  }
+  return priceCache[currency];
 }
 
 
 export async function getEthPrice() {
   let response = await fetch(ETH_QUERY_URL);
   let data = await response.json();
-
-
   await getAssetPrice('ETH');
-
   return data.USD;
 }
 
@@ -59,4 +65,16 @@ export function calculateInterest(amount, period, currency) {
   let interest =  Math.sign(period) * (amount * formula - amount);
   console.log("Calculate " + amount + " " + currency.title + " for: " + period + " = " + interest);
   return interest;
+}
+
+export async function calculateCollateral(amount, period, borrowingCurrency, collateralCurrency) {
+  let borrowingAssetPrice = await getAssetPrice(borrowingCurrency.title);
+  let collateralPrice =  await getAssetPrice(collateralCurrency.title);
+
+  let loanValue = amount * borrowingAssetPrice;
+
+  let collateralValue = loanValue * 3;
+  let collateralAmount = collateralValue / collateralPrice;
+  console.log("VAL: " + collateralAmount);
+  return collateralAmount;
 }

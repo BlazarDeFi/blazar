@@ -7,6 +7,7 @@ import FUTURE_TOKEN_JSON from '@contracts/FutureToken.json'
 import IR_STRATEGY_JSON from '@contracts/DefaultReserveInterestRateStrategy.json'
 import ERC20_JSON from '@contracts/ERC20.json'
 import CHAINLINK_JSON from '@contracts/AggregatorInterface.json'
+import BORROWING_JSON from '@contracts/BorrowingService.json'
 
 import deployment from './deployment.json';
 
@@ -22,9 +23,10 @@ var setup = async function(json) {
   return c;
 };
 
-var ir, dai, pool, chainLinkEth;
+var ir, dai, pool, borrowingService;
 let ft = {};
 let bt = {};
+let chainLink = {};
 
 export async function getFUTURE_TOKEN() {
   return await setup(FUTURE_TOKEN_JSON);
@@ -42,6 +44,9 @@ export async function getERC20() {
   return await setup(ERC20_JSON);
 }
 
+export async function getBORROWING() {
+  return await setup(BORROWING_JSON);
+}
 
 export async function getLendingPool() {
   if (pool === undefined) {
@@ -103,14 +108,25 @@ export async function getDaiToken() {
 }
 
 
-export async function getChainLinkEth() {
-  if (chainLinkEth === undefined) {
+export async function getChainLink(currency) {
+  if (chainLink[currency] === undefined) {
     let CHAINLINK = await getCHAINLINK();
-    chainLinkEth = await CHAINLINK.at(deployment.CHAINLINK_ETH_USD);
-    console.log("Linked chainlink-eth-usd: " + chainLinkEth.address);
+    chainLink[currency] = await CHAINLINK.at(deployment["CHAINLINK_" + currency.toUpperCase()]);
+    console.log("Linked chainlink- " + currency + " : " + chainLink.address);
   }
-  return chainLinkEth;
+  return chainLink[currency];
 }
+
+
+export async function getBorrowingService() {
+  if (borrowingService === undefined) {
+    let BORROWING = await getBORROWING();
+    borrowingService = await BORROWING.at(deployment.BORROWING_SERVICE);
+    console.log("Borrowing service linked: " + borrowingService.address);
+  }
+  return borrowingService;
+}
+
 
 
 
