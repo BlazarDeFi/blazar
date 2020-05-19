@@ -23,6 +23,7 @@
     "solidity-docgen": "^0.3.13",
     "truffle-contract": "^4.0.31",
     "vue": "^2.5.2",
+    "vue-async-computed": "^3.8.2",
     "vue-chartjs": "^3.5.0",
     "vue-chartkick": "^0.6.0",
     "vue-google-charts": "^0.3.2",
