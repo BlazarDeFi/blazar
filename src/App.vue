@@ -15,6 +15,13 @@
           </md-tab>
 
           <md-tab
+            key="new_loan"
+            to="/borrow"
+            md-label="New loan"
+            exact>
+          </md-tab>
+
+          <md-tab
             key="future"
             to="/future"
             md-label="Future tokens"

@@ -16,7 +16,8 @@ let state = {
       rate: 0,
       step: 0.1,
       precision: 2,
-      balance: 0
+      balance: 0,
+      borrowingRate: 0
     }
   },
   myActions: []

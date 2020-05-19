@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
+import Deposit from '@/components/Deposit'
+import Borrow from '@/components/Borrow'
 import Future from '@/components/Future'
 import Stats from '@/components/Stats'
 import History from '@/components/History'
@@ -13,8 +14,13 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
-      component: Home
+      name: 'Deposit',
+      component: Deposit
+    },
+    {
+      path: '/borrow',
+      name: 'Borrow',
+      component: Borrow
     },
     {
       path: '/future',
