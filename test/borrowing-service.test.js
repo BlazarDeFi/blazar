@@ -10,6 +10,7 @@ require("./test-setup");
 
 contract('Borrowing service', function ([owner, oracle, borrower]) {
   var borrowing, pool, dai, priceProvider;
+  var currentPeriod, period1plus;
 
   before("deploy borrowing service", async function () {
     pool = await MockPool.new();
@@ -17,6 +18,12 @@ contract('Borrowing service', function ([owner, oracle, borrower]) {
     priceProvider = await MockAssetsPriceProvider.new();
 
     borrowing = await BorrowingService.new(dai.address, oracle, pool.address, priceProvider.address);
+  });
+
+  it("should calculate correct period", async function () {
+    currentPeriod = parseInt(await borrowing.getCurrentPeriod());
+    period1plus = currentPeriod + 1;
+    console.log("Current period: " + currentPeriod + " in 1 months: " + period1plus);
   });
 
   it("should set asset price", async function () {
@@ -53,7 +60,7 @@ contract('Borrowing service', function ([owner, oracle, borrower]) {
     await dai.mint(pool.address, 1000);
     (await dai.balanceOf(pool.address)).should.be.bignumber.equal('1000');
 
-    await borrowing.borrow(1000, dai.address, ETH_ADDRESS, {value: 30, from: borrower});
+    await borrowing.borrow(1000, ETH_ADDRESS, period1plus, {value: 30, from: borrower});
 
     (await web3.eth.getBalance(pool.address)).should.be.equal("30");
     (await dai.balanceOf(borrower)).should.be.bignumber.equal('1000');
@@ -61,81 +68,21 @@ contract('Borrowing service', function ([owner, oracle, borrower]) {
   });
 
 
+  it("should register borrowings", async function () {
+    (await borrowing.getUserDebt(currentPeriod)).should.be.bignumber.equal('0');
+    (await borrowing.getUserDebt(period1plus)).should.be.bignumber.equal('1000');
 
-  //
-  //
-  // it("should mint and approve", async function () {
-  //   await dai.mint(owner, 100);
-  //   //Max value approval
-  //   await dai.approve(ft.address, 1000000);
-  // });
-  //
-  //
-  // it("should deposit in current period", async function () {
-  //   (await ft.balanceOf(owner, 0)).should.be.bignumber.equal('0');
-  //
-  //   await ft.deposit(100, 0);
-  //
-  //   (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal('100');
-  //   (await ft.getTotalInterests()).should.be.bignumber.equal('0');
-  //
-  //   (await ft.getTotalCollateral()).should.be.bignumber.equal('100');
-  //   (await dai.balanceOf(pool.address)).should.be.bignumber.equal('100');
-  // });
-  //
-  //
-  // it("should withdraw money", async function () {
-  //   await ft.withdraw(50, currentPeriod);
-  //
-  //   //Depositor
-  //   (await dai.balanceOf(owner)).should.be.bignumber.equal('50');
-  //   //Pool
-  //   (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal('50');
-  //   (await ft.getTotalCollateral()).should.be.bignumber.equal('50');
-  //   (await dai.balanceOf(pool.address)).should.be.bignumber.equal('50');
-  // });
-  //
-  //
-  // it("should warp money to future", async function () {
-  //   await ft.warp(50, currentPeriod, period6plus);
-  //
-  //   //Future tokens
-  //   (await ft.balanceOf(owner, currentPeriod)).should.be.bignumber.equal('0');
-  //   (await ft.balanceOf(owner, period6plus)).should.be.bignumber.equal('50');
-  //   //Depositor
-  //   (await dai.balanceOf(owner)).should.be.bignumber.equal('53');
-  //   //Pool
-  //   (await ft.getTotalCollateral()).should.be.bignumber.equal('47');
-  //   (await dai.balanceOf(pool.address)).should.be.bignumber.equal('47');
-  // });
-  //
-  //
-  //
-  // it("should warp money to present", async function () {
-  //   await ft.warp(50, period6plus, period1plus);
-  //
-  //   //Future tokens
-  //   (await ft.balanceOf(owner, period1plus)).should.be.bignumber.equal('50');
-  //   (await ft.balanceOf(owner, period6plus)).should.be.bignumber.equal('0');
-  //   //Depositor
-  //   (await dai.balanceOf(owner)).should.be.bignumber.equal('51');
-  //   //Pool
-  //   (await ft.getTotalCollateral()).should.be.bignumber.equal('49');
-  //   (await dai.balanceOf(pool.address)).should.be.bignumber.equal('49');
-  // });
-  //
-  //
-  // it("should withdraw rest of the money", async function () {
-  //   await ft.withdraw(50, period1plus);
-  //
-  //   //Future tokens
-  //   (await ft.balanceOf(owner, period1plus)).should.be.bignumber.equal('0');
-  //   (await ft.balanceOf(owner, period6plus)).should.be.bignumber.equal('0');
-  //   //Depositor
-  //   (await dai.balanceOf(owner)).should.be.bignumber.equal('100');
-  //   //Pool
-  //   (await ft.getTotalCollateral()).should.be.bignumber.equal('0');
-  //   (await dai.balanceOf(pool.address)).should.be.bignumber.equal('0');
-  // });
+    (await borrowing.getTotalDebt(currentPeriod)).should.be.bignumber.equal('0');
+    (await borrowing.getTotalDebt(period1plus)).should.be.bignumber.equal('1000');
+
+    (await borrowing.getUserDebt12months(currentPeriod)).forEach( (item, index) => {
+      item.should.be.bignumber.equal(index === 1 ? '1000' : '0');
+    });
+
+  });
+
+
+
+
 
 });

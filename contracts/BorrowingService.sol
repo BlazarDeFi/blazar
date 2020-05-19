@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import "./IExternalPool.sol";
 import "./IAssetBacked.sol";
 import "./IAssetsPriceProvider.sol";
+import "./Calendar.sol";
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -20,10 +21,21 @@ contract BorrowingService is Ownable, IAssetBacked {
 
 
   /**
-    * @dev emitted after the deposit action
-    * @param _collateralRatio new collateral ratio
+  * @dev emitted after the deposit action
+  * @param account an address of the borrower
+  * @param value the borrowed amount
+  * @param originationTime the exact time when the loan was taken
+  * @param maturityPeriod a period on which loan is expected to be returned
   **/
-  event CollateralRatioUpdated(address _collateralAddress, uint256 _collateralRatio);
+  event Borrow(address indexed account, uint256 value, uint256 originationTime, uint256 maturityPeriod);
+
+
+  /**
+    * @dev emitted when the collateral ratio is updated by the admin
+    * @param collateralAddress address of the collateral
+    * @param newCollateralRatio value of the new collateral ratio
+  **/
+  event CollateralRatioUpdated(address collateralAddress, uint256 newCollateralRatio);
 
   //A original asset that is going to be deposited and redeemed
   address public originalAsset;
@@ -42,6 +54,15 @@ contract BorrowingService is Ownable, IAssetBacked {
 
   //An oracle-linked contract providing price per crypto-asset denominated in USD
   IAssetsPriceProvider assetsPriceProvider;
+
+
+  //Current status of protocol debt clustered by periods
+  mapping(uint256 => uint256) debt;
+
+  //Current status of user debt clustered by periods
+  mapping(uint256 => uint256) userDebt;
+
+
 
   /**
   * @dev The annotated function may only be called by the interest rates oracle
@@ -66,18 +87,23 @@ contract BorrowingService is Ownable, IAssetBacked {
 
 
 
-  function borrow(uint256 _loanAmount, address _collateralAddress) external payable {
+  function borrow(uint256 _loanAmount, address _collateralAddress, uint256 maturityPeriod) external payable {
     uint256 collateralAmount = getRequiredCollateral(_collateralAddress, _loanAmount);
 
     if (this.isEthBacked()) {
       require(msg.value >= collateralAmount, "Not enough ether attached to the transaction");
       externalPool.deposit.value(collateralAmount)(collateralAmount);
     } else {
-//      //Implement token collateral
-////      IERC20(originalAsset).transferFrom(msg.sender, address(externalPool), lendingPoolDeposit);
-////      externalPool.deposit(lendingPoolDeposit);
+      IERC20(originalAsset).transferFrom(msg.sender, address(externalPool), collateralAmount);
+      externalPool.deposit(collateralAmount);
     }
     externalPool.borrow(_loanAmount, originalAsset, msg.sender);
+
+    //Update debt accounting
+    debt[maturityPeriod] = debt[maturityPeriod].add(_loanAmount);
+    userDebt[maturityPeriod] = userDebt[maturityPeriod].add(_loanAmount);
+
+    emit Borrow(msg.sender, _loanAmount, now, maturityPeriod);
   }
 
 
@@ -116,6 +142,21 @@ contract BorrowingService is Ownable, IAssetBacked {
     return collateralValue.div(assetsPriceProvider.getAssetPrice(_collateralAddress));
   }
 
+  function getUserDebt(uint256 maturityPeriod) public view returns(uint256) {
+    return userDebt[maturityPeriod];
+  }
+
+  function getUserDebt12months(uint256 startPeriod) public view returns(uint256[] memory) {
+    uint256[] memory result = new uint256[](12);
+    for(uint256 i = 0; i<12; i++) {
+      result[i] = userDebt[startPeriod + i];
+    }
+    return result;
+  }
+
+  function getTotalDebt(uint256 maturityPeriod) public view returns(uint256) {
+    return debt[maturityPeriod];
+  }
 
   function isEthBacked() external view returns(bool) {
     return true;
@@ -123,6 +164,10 @@ contract BorrowingService is Ownable, IAssetBacked {
 
   function backingAsset() external view returns(IERC20) {
     return IERC20(ETHER);
+  }
+
+  function getCurrentPeriod() external view returns(uint256) {
+    return Calendar.getCurrentMonth();
   }
 
 
