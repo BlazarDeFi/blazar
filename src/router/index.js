@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Deposit from '@/components/Deposit'
 import Borrow from '@/components/Borrow'
-import Future from '@/components/Future'
+import Dashboard from '@/components/Dashboard'
 import Stats from '@/components/Stats'
 import History from '@/components/History'
 
@@ -23,9 +23,9 @@ export default new Router({
       component: Borrow
     },
     {
-      path: '/future',
-      name: 'future',
-      component: Future
+      path: '/dashboard',
+      name: 'dashboard',
+      component: Dashboard
     },
     {
       path: '/history',

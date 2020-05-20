@@ -22,9 +22,9 @@
           </md-tab>
 
           <md-tab
-            key="future"
-            to="/future"
-            md-label="Future tokens"
+            key="dashboard"
+            to="/dashboard"
+            md-label="Dashboard"
             exact>
 
           </md-tab>

@@ -60,7 +60,7 @@ contract BorrowingService is Ownable, IAssetBacked {
   mapping(uint256 => uint256) debt;
 
   //Current status of user debt clustered by periods
-  mapping(uint256 => uint256) userDebt;
+  mapping(address => mapping(uint256 => uint256)) userDebt;
 
 
 
@@ -87,8 +87,9 @@ contract BorrowingService is Ownable, IAssetBacked {
 
 
 
-  function borrow(uint256 _loanAmount, address _collateralAddress, uint256 maturityPeriod) external payable {
+  function borrow(uint256 _loanAmount, address _collateralAddress, uint256 loanDuration) external payable {
     uint256 collateralAmount = getRequiredCollateral(_collateralAddress, _loanAmount);
+    uint256 maturityPeriod = getCurrentPeriod().add(loanDuration);
 
     if (this.isEthBacked()) {
       require(msg.value >= collateralAmount, "Not enough ether attached to the transaction");
@@ -101,7 +102,7 @@ contract BorrowingService is Ownable, IAssetBacked {
 
     //Update debt accounting
     debt[maturityPeriod] = debt[maturityPeriod].add(_loanAmount);
-    userDebt[maturityPeriod] = userDebt[maturityPeriod].add(_loanAmount);
+    userDebt[msg.sender][maturityPeriod] = userDebt[msg.sender][maturityPeriod].add(_loanAmount);
 
     emit Borrow(msg.sender, _loanAmount, now, maturityPeriod);
   }
@@ -142,19 +143,19 @@ contract BorrowingService is Ownable, IAssetBacked {
     return collateralValue.div(assetsPriceProvider.getAssetPrice(_collateralAddress));
   }
 
-  function getUserDebt(uint256 maturityPeriod) public view returns(uint256) {
-    return userDebt[maturityPeriod];
+  function getUserDebt(address _user, uint256 _maturityPeriod) external view returns(uint256) {
+    return userDebt[_user][_maturityPeriod];
   }
 
-  function getUserDebt12months(uint256 startPeriod) public view returns(uint256[] memory) {
+  function getUserDebt12months(address _user, uint256 _startPeriod) external view returns(uint256[] memory) {
     uint256[] memory result = new uint256[](12);
     for(uint256 i = 0; i<12; i++) {
-      result[i] = userDebt[startPeriod + i];
+      result[i] = userDebt[_user][_startPeriod + i];
     }
     return result;
   }
 
-  function getTotalDebt(uint256 maturityPeriod) public view returns(uint256) {
+  function getTotalDebt(uint256 maturityPeriod) external view returns(uint256) {
     return debt[maturityPeriod];
   }
 
@@ -166,7 +167,7 @@ contract BorrowingService is Ownable, IAssetBacked {
     return IERC20(ETHER);
   }
 
-  function getCurrentPeriod() external view returns(uint256) {
+  function getCurrentPeriod() public view returns(uint256) {
     return Calendar.getCurrentMonth();
   }
 

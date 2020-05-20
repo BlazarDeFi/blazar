@@ -29,7 +29,7 @@
         <range-slider
           class="slider"
           min="1"
-          max="9"
+          max="7"
           step="1"
           v-model="time">
         </range-slider>
@@ -145,7 +145,7 @@
         this.showModal = true;
         try {
           await borrow(this.loan, this.time, this.selectedCurrency.title, this.collateralCurrency.title);
-          this.$router.push({path: '/future'});
+          this.$router.push({path: '/dashboard'});
           await getBalances();
         } finally {
           this.showModal = false;

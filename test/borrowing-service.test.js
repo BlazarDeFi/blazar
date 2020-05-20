@@ -60,7 +60,7 @@ contract('Borrowing service', function ([owner, oracle, borrower]) {
     await dai.mint(pool.address, 1000);
     (await dai.balanceOf(pool.address)).should.be.bignumber.equal('1000');
 
-    await borrowing.borrow(1000, ETH_ADDRESS, period1plus, {value: 30, from: borrower});
+    await borrowing.borrow(1000, ETH_ADDRESS, 1, {value: 30, from: borrower});
 
     (await web3.eth.getBalance(pool.address)).should.be.equal("30");
     (await dai.balanceOf(borrower)).should.be.bignumber.equal('1000');
@@ -69,13 +69,13 @@ contract('Borrowing service', function ([owner, oracle, borrower]) {
 
 
   it("should register borrowings", async function () {
-    (await borrowing.getUserDebt(currentPeriod)).should.be.bignumber.equal('0');
-    (await borrowing.getUserDebt(period1plus)).should.be.bignumber.equal('1000');
+    (await borrowing.getUserDebt(borrower, currentPeriod)).should.be.bignumber.equal('0');
+    (await borrowing.getUserDebt(borrower, period1plus)).should.be.bignumber.equal('1000');
 
     (await borrowing.getTotalDebt(currentPeriod)).should.be.bignumber.equal('0');
     (await borrowing.getTotalDebt(period1plus)).should.be.bignumber.equal('1000');
 
-    (await borrowing.getUserDebt12months(currentPeriod)).forEach( (item, index) => {
+    (await borrowing.getUserDebt12months(borrower, currentPeriod)).forEach( (item, index) => {
       item.should.be.bignumber.equal(index === 1 ? '1000' : '0');
     });
 

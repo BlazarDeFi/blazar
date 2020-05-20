@@ -29,7 +29,7 @@
         <range-slider
           class="slider"
           min="1"
-          max="9"
+          max="7"
           step="1"
           v-model="time">
         </range-slider>
@@ -153,7 +153,7 @@
         this.showModal = true;
         try {
           await makeDeposit(this.deposit, this.time, this.selectedCurrency.title);
-          this.$router.push({path: '/future'});
+          this.$router.push({path: '/dashboard'});
           let interestText = this.selectedCurrency.title == 'ETH'
             ? this.$options.filters.ethToUsd(this.interest)
             : (this.interest + " " + this.selectedCurrency.title);

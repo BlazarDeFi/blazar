@@ -15,11 +15,10 @@
               <md-card-header-text>
                 <div class="md-title">Future tokens</div>
                 <div class="md-subhead">
-                  Each red dot indicates when your fTokens are redeemable.<br/>
+                  Each red dot indicates when your fTokens are redeemable.
                   Click on each one to transfer them or change their maturity date.
                 </div>
               </md-card-header-text>
-
 
             </md-card-header>
 
@@ -31,7 +30,6 @@
                   <md-table-head>Currency</md-table-head>
                   <md-table-head>Total</md-table-head>
 
-                  <md-table-head>Apr</md-table-head>
                   <md-table-head>May</md-table-head>
                   <md-table-head>Jun</md-table-head>
                   <md-table-head>Jul</md-table-head>
@@ -48,11 +46,11 @@
                          style="height: 24px; margin-right: 3px;"> ETH
                   </md-table-cell>
                   <md-table-cell><b>{{balances['ETH'][12] | fullEthToUsd}}</b></md-table-cell>
-                  <md-table-cell v-for="i in 9" :key="i">
+                  <md-table-cell v-for="i in 8" :key="i">
                     <md-button class="md-fab md-mini" style="color: white;"
-                               v-if="balances['ETH'] && balances['ETH'][i + 2] > 0"
-                               @click="transfer(balances['ETH'][i + 2], i + 2, 'ETH')">
-                      {{balances['ETH'][i + 2]}}
+                               v-if="balances['ETH'] && balances['ETH'][i + 3] > 0"
+                               @click="transfer(balances['ETH'][i + 3], i + 3, 'ETH')">
+                      {{balances['ETH'][i + 3]}}
                     </md-button>
                     <span v-else>-</span>
                   </md-table-cell>
@@ -65,16 +63,15 @@
                   </md-table-cell>
                   <md-table-cell><b>{{balances['DAI'][12] | token}}</b></md-table-cell>
 
-                  <md-table-cell v-for="i in 9" :key="i">
-                    <md-button class="md-fab md-mini" style="color: white;" v-if="balances['DAI'][i + 2] > 0"
-                               @click="transfer(balances['DAI'][i + 2], i + 2, 'DAI')">
-                      {{balances['DAI'][i + 2] | token}}
+                  <md-table-cell v-for="i in 8" :key="i">
+                    <md-button class="md-fab md-mini" style="color: white;" v-if="balances['DAI'][i + 3] > 0"
+                               @click="transfer(balances['DAI'][i + 3], i + 3, 'DAI')">
+                      {{balances['DAI'][i + 3] | token}}
                     </md-button>
                     <span v-else>-</span>
                   </md-table-cell>
                 </md-table-row>
               </md-table>
-
 
             </md-card-content>
           </md-ripple>
@@ -82,6 +79,74 @@
       </div>
     </div>
 
+    <div style="height: 20px;"></div>
+
+    <div class="md-layout md-gutter">
+
+      <div class="md-layout-item">
+        <md-card>
+          <md-ripple>
+
+            <md-card-header class="md-layout-item md-size-100">
+              <md-card-header-text>
+                <div class="md-title">Loans</div>
+                <div class="md-subhead">
+                  Each red dot indicates when your your loan is payable.
+                </div>
+              </md-card-header-text>
+
+            </md-card-header>
+
+
+            <md-card-content>
+
+              <md-table>
+                <md-table-row>
+                  <md-table-head>Currency</md-table-head>
+                  <md-table-head>Total</md-table-head>
+
+                  <md-table-head>May</md-table-head>
+                  <md-table-head>Jun</md-table-head>
+                  <md-table-head>Jul</md-table-head>
+                  <md-table-head>Aug</md-table-head>
+                  <md-table-head>Sep</md-table-head>
+                  <md-table-head>Oct</md-table-head>
+                  <md-table-head>Nov</md-table-head>
+                  <md-table-head>Dec</md-table-head>
+                </md-table-row>
+
+                <md-table-row v-if="balances['ETH']">
+                  <md-table-cell>
+                    <img src="https://testnet.aave.com/static/media/eth.1a64eee6.svg"
+                         style="height: 24px; margin-right: 3px;"> ETH
+                  </md-table-cell>
+                  <md-table-cell></md-table-cell>
+                  <md-table-cell v-for="i in 8" :key="i">
+                    -
+                  </md-table-cell>
+                </md-table-row>
+
+                <md-table-row v-if="balances['DAI']">
+                  <md-table-cell>
+                    <img src="https://testnet.aave.com/static/media/dai.59d423e0.svg"
+                         style="height: 24px; margin-right: 3px; margin-top: -3px;"> DAI
+                  </md-table-cell>
+                  <md-table-cell><b>{{loans[12] | token}}</b></md-table-cell>
+
+                  <md-table-cell v-for="i in 8" :key="i">
+                    <md-button class="md-fab md-mini" style="color: white;" v-if="loans[i-1] > 0" >
+                      {{loans[i-1] | token}}
+                    </md-button>
+                    <span v-else>-</span>
+                  </md-table-cell>
+                </md-table-row>
+              </md-table>
+
+            </md-card-content>
+          </md-ripple>
+        </md-card>
+      </div>
+    </div>
 
     <md-dialog :md-active.sync="showTransferDialog" style="width: 500px; height: 380px;">
       <md-dialog-title>Transfer</md-dialog-title>
@@ -113,7 +178,7 @@
               <!--<md-input name="timeTarget" id="timeTarget" v-model="timeTarget" />-->
               <range-slider
                 class="slider"
-                min="4"
+                min="5"
                 max="12"
                 step="1"
                 v-model="timeTarget">
@@ -194,6 +259,7 @@
 
 <script>
   import {getBalances, spaceTransfer, timeTransfer, withdraw} from '@/blockchain/futureToken'
+  import {getLoans} from '@/blockchain/borrowing'
   import {getLendingConfig, getReserveData} from '@/blockchain/aave'
   import {deployFutureCoin} from '@/blockchain/deployer'
   import { calculateInterest, getDepositRates } from '@/blockchain/stats'
@@ -210,6 +276,7 @@
       return {
         currencies: State.currencies,
         balances: {},
+        loans: {},
         showTransferDialog: false,
         selectedMax: 0,
         selectedPeriod: 0,
@@ -239,6 +306,7 @@
     },
     beforeCreate: async function () {
       this.balances = await getBalances();
+      this.loans = await getLoans();
       await getDepositRates();
     },
     methods: {
@@ -378,6 +446,10 @@
   span.max-link {
     text-decoration: underline;
     cursor: pointer;
+  }
+
+  .md-table-head-container {
+    text-align: center;
   }
 
 
